@@ -1,0 +1,366 @@
+﻿<html>
+	<head>
+		<TITLE>SanKoBot</TITLE>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="/js/jquery1.6.min.js"></script>
+	<script type="text/javascript" src="/jsLib/jqueryui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/jsLib/jqueryui/jqueryui.css" />
+	<script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	<link rel="shortcut icon" type="image/x-icon" href="/msa/logo.ico" />
+
+	<script type="text/javascript" src="/js/bctech_checkbox.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/bctech_checkbox.css">
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/js/waiteffect.js"></script>
+	<script type="text/javascript" src="/js/pubvalidate.js"></script>
+	<style type="text/css">
+		
+		#content table tbody tr td {
+			border-bottom: 1px solid rgba(0,0,0,0);;
+			border-top: 1px solid rgba(0,0,0,0);
+		}
+		#content table tbody tr:nth-child(2n+1) td {
+			background-color: rgba(0,0,0,0);
+		}
+		
+	</style>	  
+	  
+	<script type="text/javascript">
+		var HAND_DRAW=1;		//是否启用手绘功能
+		var DRAW_HEAD_LOG=1;	//手绘坐标头LOG
+		var DRAW_BODY_LOG=0;	//手绘坐标体LOG
+		var DRAW_WIDTH=1024;
+		var canvas1;			//地图显示(底层)
+  		var context1;
+  		var canvas2;			//轨迹规划层
+  		var context2;	
+  		var canvas3;			//手动画图(上层)
+  		var context3;
+		var pix_x,pix_y;		//单一的随时可获取的一个点
+		var PA_x,PA_y;			//A
+		var PB_x,PB_y;			//B
+		
+		$(document).ready(function() {
+	  		initdata();
+			window.document.onkeydown = disableRefresh;
+			
+	  	});
+	  	
+		 
+		function initdata(){
+	  		//设置页面的宽度和高度
+	  		$(".bloc")[0].style.width=1650;	  		
+	  		$(".content")[0].style.height=1080;
+	  		$("#content")[0].style.height=1150;
+	  		canvas1=document.getElementById("canvas1"); 
+			canvas1.width=DRAW_WIDTH;
+			canvas1.height=DRAW_WIDTH;
+			$("#canvas1")[0].style.width =DRAW_WIDTH;
+			$("#canvas1")[0].style.height =DRAW_WIDTH;
+			context1=canvas1.getContext("2d");
+			
+			canvas2=document.getElementById("canvas2"); 
+			canvas2.width=DRAW_WIDTH;
+			canvas2.height=DRAW_WIDTH;
+			$("#canvas2")[0].style.width =DRAW_WIDTH;
+			$("#canvas2")[0].style.height =DRAW_WIDTH;
+			context2=canvas2.getContext("2d");
+			
+			canvas3=document.getElementById("canvas3"); 
+			canvas3.width=DRAW_WIDTH;
+			canvas3.height=DRAW_WIDTH;
+			$("#canvas3")[0].style.width =DRAW_WIDTH;
+			$("#canvas3")[0].style.height =DRAW_WIDTH;
+			context3=canvas3.getContext("2d");
+			
+			//画出行走区域
+			get_map_file();
+			draw_bottom_map(); 
+			
+	  	}
+	  	function get_map_file()
+	  	{
+	  		$.ajax({
+			    type: "POST",
+			    url: "/sankobot/main.xp",
+			    dataType:'json',
+			    data:{
+			        'Fun':'get_map_file',
+			        'a':1
+			    },
+			    success: function (data){
+			        if(data.status!="ok")
+			        	alert(data.status);
+			    },
+			    error:function(){
+			    	
+			    }
+			}); 	
+	  	}
+	  	
+	  	
+	  	function draw_bottom_map()
+		{
+			setTimeout(function(){
+	    		$.ajax({
+					url:"/slampic/json/map_file.json",//json文件位置
+					type: "GET",//请求方式为get
+					dataType: "json", //返回数据格式为json
+					async: false,
+					success: function(data) {//请求成功完成后要执行的方法 
+						var val;
+						var arr;
+						var len=0;
+						var count=0;
+						var begin=0;
+						var unit=1;
+						$.each(data.Results, function (i, Result) {
+			    			if(Result.val!="head"){
+				    			arr=Result.val.split("$");
+				    			len=Number(arr[0]);
+				    			if("#6C3365"==arr[1]){		//轨迹规划层
+				    				context2.fillStyle=arr[1];
+					    			context2.beginPath();
+					    			context2.fillRect(unit*(begin%DRAW_WIDTH),unit*(1023-parseInt(begin/DRAW_WIDTH)),unit*len,unit);
+									context2.stroke(); 
+									context2.closePath();
+				    			}else{						//地图底层
+				    				context1.fillStyle=arr[1];
+					    			context1.beginPath();
+					    			context1.fillRect(unit*(begin%DRAW_WIDTH),unit*(1023-parseInt(begin/DRAW_WIDTH)),unit*len,unit);
+									context1.stroke(); 
+									context1.closePath();
+				    			}
+				    			
+								begin+=len;
+							}
+			    		});
+			    		context1.lineWidth = 3;
+	  					context1.strokeStyle="#000000";
+	  					context1.strokeRect(0,0,DRAW_WIDTH,DRAW_WIDTH);
+			    	}
+			    });
+		    },1000);
+		}
+		
+		
+		function draw_route_in_snake(){
+			$.ajax({
+			    type: "POST",
+			    url: "/sankobot/main.xp",
+			    dataType:'json',
+			    data:{
+			        'Fun':'draw_route_in_snake',
+			        'PA_x':PA_x,
+			        'PA_y':PA_y,
+			        'PB_x':PB_x,
+			        'PB_y':PB_y,
+			        'a':1
+			    },
+			    success: function (data){
+			        context3.clearRect(12,12,400,50);
+		        	setTimeout(function(){
+						context3.font = "bold 24px Arial";
+						context3.fillStyle = "#8600FF";
+						context3.fillText(data.status, 20, 40);	
+					},300);
+			    },
+			    error:function(){
+			    	
+			    }
+			});
+		}	
+		function draw_one_point(val){
+			context3.lineWidth=5;
+			context3.strokeStyle="#272727";
+        	context3.beginPath();
+    		context3.moveTo(pix_x,pix_y);
+    		context3.lineTo(pix_x+5,pix_y);
+    		context3.stroke(); 
+       		context3.closePath();
+       		if(val=="A"){
+       			PA_x=pix_x;PA_y=1023-pix_y;
+			}else if(val=="B"){
+				PB_x=pix_x;PB_y=1023-pix_y;
+			}
+		}	
+		function disableRefresh(evt){
+			evt = (evt) ? evt : window.event;
+			evt.stopPropagation();
+			//evt.preventDefault();
+			if (evt.keyCode) {
+				if(evt.keyCode == 65&&evt.shiftKey){	//shift+A
+					pix_x=Number($("#draw_AX").val());
+					pix_y=Number($("#draw_AY").val());
+					draw_one_point("A");
+				}
+				if(evt.keyCode == 65){			//A
+					if(!evt.shiftKey){
+						draw_one_point("A");
+					}
+				}
+				if(evt.keyCode == 66&&evt.shiftKey){	//shift+B
+					pix_x=Number($("#draw_BX").val());
+					pix_y=Number($("#draw_BY").val());
+					draw_one_point("B");
+				}
+				if(evt.keyCode == 66){			//B
+					if(!evt.shiftKey){
+						draw_one_point("B");
+					}
+				}
+				if(evt.keyCode == 68){			//D
+					 if(HAND_DRAW==1)send_point(0,0,"tail");
+				}
+				if(evt.keyCode == 72){			//Hide隐藏轨迹
+					//72 H	
+					if($("#canvas1")[0].style.display=="none"){
+						$("#canvas1")[0].style.display="block";
+					}else{
+						$("#canvas1")[0].style.display="none";
+					}
+				}
+				if(evt.keyCode == 32){			//Space
+					 draw_route_in_snake();
+				}
+			}
+		}	
+		function goto_grid_map(){
+			window.location.href = '/san/grid_map.htm';	
+		}
+		function goto_small_map(){
+			window.location.href = '/san/snake_map_edit.htm';	
+		}
+		function reflash_map(){
+			window.location.href = '/san/snake_map.htm';	
+		}
+		</script>
+	</head>
+	
+    <body style="overflow-x: hidden;">
+        <div id="content" class="white">
+            <h1 style="margin:0px 0px 0px 10px;"><img src="/icons/bookmarks-2.png" alt="" />
+            	&nbsp;&nbsp;&nbsp;SanKobot
+            </h1>
+            <div class="bloc"style="position: relative;top: -60px;">
+                <div class="title" style="z-index: 110;">
+                	<p>
+                    	<font color="#009100" id="version_val"style="font-size: smaller;">
+  	                    	<span style="left:10px;position:relative;">Ax</span>
+  	                    	<input id="draw_AX" type="text" class="input" style="width:80px;left:20px;top:-2px;position:relative;height:28px;" value="" >
+							<span style="left:30px;position:relative;">Ay</span>
+  	                    	<input id="draw_AY" type="text" class="input" style="width:80px;left:40px;top:-2px;position:relative;height:28px;" value="" >
+							<span style="left:50px;position:relative;">Bx</span>
+  	                    	<input id="draw_BX" type="text" class="input" style="width:80px;left:60px;top:-2px;position:relative;height:28px;" value="" >
+							<span style="left:70px;position:relative;">By</span>
+  	                    	<input id="draw_BY" type="text" class="input" style="width:80px;left:80px;top:-2px;position:relative;height:28px;" value="" >
+							
+  	                    	<button "type="button" class="button black1"style="width:80px;left:400px;top:2px;" onclick="goto_small_map()">小地图</button>
+       						<button "type="button" class="button black1"style="width:80px;left:450px;top:2px;" onclick="goto_grid_map()">栅格图</button>
+       						<button "type="button" class="button black1"style="width:80px;left:500px;top:2px;" onclick="reflash_map()">刷新</button>
+       				
+  	                  	</font>
+                    			
+                    </p>
+                </div>                 
+                <div class="content" style="">
+                    <div class="input">
+                    	
+                    	
+                    	<div id=""style="top:66px;z-index: 100;position: absolute;left: 35px;">
+                        	<canvas id="canvas1"  style="width:1024px;height:1024px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        <div id=""style="top:66px;z-index: 100;position: absolute;left: 35px;">
+                        	<canvas id="canvas2"  style="width:1024px;height:1024px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        <div id=""style="top:66px;z-index: 100;position: absolute;left: 35px;">
+                        	<canvas id="canvas3"  style="width:1024px;height:1024px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        		
+                        
+	                </div>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+	        var dragFlag = false;
+			var pre_x,pre_y;
+			var drew_count=0;
+			document.onmousedown = function (e) {
+				//e.preventDefault();
+				e = e || window.event;
+			    if(Math.floor((e.clientY-76+$(window).scrollTop())/10)<0){
+					return;
+			    }else{
+				    pix_x = e.clientX-42;
+				    pix_y = e.clientY-76+$(window).scrollTop();
+				    if(DRAW_HEAD_LOG==1)console.log((pix_x)+"+"+(pix_y));
+				    dragFlag = true;
+				    drew_count=0;
+				}
+			};
+			document.onmousemove = function (e) {
+			    if (dragFlag) {
+			        e = e || window.event;
+			        ++drew_count;
+			        if(drew_count==1){
+			        	pre_x=e.clientX -42;
+						pre_y=e.clientY -76+$(window).scrollTop();
+						if(HAND_DRAW==1)send_point(pre_x,pre_y,"head");
+			        }else{
+			        	context3.lineWidth=3;
+						context3.strokeStyle="#272727";
+		            	context3.beginPath();
+	            		context3.moveTo(pre_x,pre_y);
+	            		context3.lineTo(e.clientX -42,e.clientY -76+$(window).scrollTop());
+	            		pre_x=e.clientX -42;
+						pre_y=e.clientY -76+$(window).scrollTop();
+						context3.stroke(); 
+		           		context3.closePath();
+		           		if(HAND_DRAW==1)send_point(pre_x,pre_y,"body");
+			        }
+			        if(DRAW_BODY_LOG==1)console.log((pre_x)+"+"+(pre_y));
+			    } 
+			}; 
+		    document.onmouseup = function (e) {
+		    	dragFlag = false;
+		    	e.preventDefault();
+		    	
+		    }; 
+		    function send_point(x,y,where){
+		    	$.ajax({
+				    type: "POST",
+				    url: "/sankobot/main.xp",
+				    dataType:'json',
+				    data:{
+				        'Fun':'make_hand_draw_map',
+				        'where':where,
+				        'x':x,
+				        'y':1023-y,
+				        'a':1
+				    },
+				    success: function (data){
+				        if(where=="tail"){
+				        	context3.clearRect(12,12,200,50);
+				        	setTimeout(function(){
+	    						context3.font = "bold 24px Arial";
+								context3.fillStyle = "#8600FF";
+								context3.fillText(data.status, 20, 40);	
+							},300);
+				        	
+							
+				        }
+				    },
+				    error:function(){
+				    	
+				    }
+				}); 	
+		    }
+		</script>
+    </body>

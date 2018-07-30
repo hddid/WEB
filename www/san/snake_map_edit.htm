@@ -1,0 +1,636 @@
+﻿<html>
+	<head>
+		<TITLE>SanKoBot</TITLE>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="/js/jquery1.6.min.js"></script>
+	<script type="text/javascript" src="/jsLib/jqueryui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/jsLib/jqueryui/jqueryui.css" />
+	<script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	<link rel="shortcut icon" type="image/x-icon" href="/msa/logo.ico" />
+
+	<script type="text/javascript" src="/js/bctech_checkbox.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/bctech_checkbox.css">
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/js/waiteffect.js"></script>
+	<script type="text/javascript" src="/js/pubvalidate.js"></script>
+	<style type="text/css">
+		
+		#content table tbody tr td {
+			border-bottom: 1px solid rgba(0,0,0,0);;
+			border-top: 1px solid rgba(0,0,0,0);
+		}
+		#content table tbody tr:nth-child(2n+1) td {
+			background-color: rgba(0,0,0,0);
+		}
+		
+	</style>	  
+	  
+	<script type="text/javascript">
+		var DRAW_HEAD_LOG=0;
+		var DRAW_WIDTH=1010;
+		var offset=511;
+		var unit=10;
+		var mirror=100;				
+		var canvas1;			//地图显示(底层)
+  		var context1;
+  		var canvas2;			//灰色网格线(中层)
+  		var context2;	
+  		var canvas3;			//手动画图(上层)
+  		var context3;	
+  		
+		var pix_x,pix_y;		//单一的随时可获取的一个点，坐标是像素
+		var pos_x,pos_y;		//单一的随时可获取的一个点，坐标是(0,0)-(100,100)
+		var theta_x=0;			//小地图相对于全局地图的偏移位置，用来上下左右平移地图
+		var theta_y=0;
+		var store_map_arr=new Array();	//存放地图所有数据，用来上下左右平移地图
+		var map_arr_count=0;
+		var fun_code=0;
+		var p1x=0;
+		var p1y=0;
+		var p2x=0;
+		var p2y=0;				//画矩形或者直线
+		var p_count=0;			//标记矩形直线的2个点
+		$(document).ready(function() {
+	  		initdata();
+			window.document.onkeydown = disableRefresh;
+			
+	  	});
+	  	
+	  	//画灰色网格
+	  	function draw_grid_line(n){
+	  		context2.lineWidth=1;
+			context2.strokeStyle="#D0D0D0";
+			var i=0;
+	    	for(i=1;i<DRAW_WIDTH/n;++i)
+	    	{
+	        	context2.beginPath();
+	        	context2.moveTo(0,n*i);
+				context2.lineTo(DRAW_WIDTH,n*i);
+	            context2.stroke(); 
+	           	context2.closePath();
+	    	}
+	    	for(i=1;i<DRAW_WIDTH/n;++i)
+	    	{
+	        	context2.beginPath();
+	        	context2.moveTo(n*i,0);
+				context2.lineTo(n*i,DRAW_WIDTH);
+	            context2.stroke(); 
+	           	context2.closePath();
+	    	} 	
+	  	}
+		 
+		function initdata(){
+	  		//设置页面的宽度和高度
+	  		$(".bloc")[0].style.width=1650;	  		
+	  		$(".content")[0].style.height=1080;
+	  		$("#content")[0].style.height=1150;
+	  		canvas1=document.getElementById("canvas1"); 
+			canvas1.width=DRAW_WIDTH;
+			canvas1.height=DRAW_WIDTH;
+			$("#canvas1")[0].style.width =DRAW_WIDTH;
+			$("#canvas1")[0].style.height =DRAW_WIDTH;
+			context1=canvas1.getContext("2d");
+			
+			canvas2=document.getElementById("canvas2"); 
+			canvas2.width=DRAW_WIDTH;
+			canvas2.height=DRAW_WIDTH;
+			$("#canvas2")[0].style.width =DRAW_WIDTH;
+			$("#canvas2")[0].style.height =DRAW_WIDTH;
+			context2=canvas2.getContext("2d");
+			
+			canvas3=document.getElementById("canvas3"); 
+			canvas3.width=DRAW_WIDTH;
+			canvas3.height=DRAW_WIDTH;
+			$("#canvas3")[0].style.width =DRAW_WIDTH;
+			$("#canvas3")[0].style.height =DRAW_WIDTH;
+			context3=canvas2.getContext("2d");
+			//画栅格
+			draw_grid_line(10);
+			//地图转码和加载
+			get_map_file();
+			draw_bottom_map(); 
+			
+	  	}
+	  	
+	  	function get_map_file()
+	  	{
+	  		$.ajax({
+			    type: "POST",
+			    url: "/sankobot/main.xp",
+			    dataType:'json',
+			    data:{
+			        'Fun':'get_map_file',
+			        'a':1
+			    },
+			    success: function (data){
+			        if(data.status!="ok")
+			        	alert(data.status);
+			    },
+			    error:function(){
+			    	
+			    }
+			}); 	
+	  	}
+	  	
+	  	function push_map()
+	  	{
+	  		var arr;
+			var len=0;
+			var begin=0;
+			var front_i=(offset-50+theta_x);
+		    var second_i=(offset+51+theta_x);
+		    var some_line_len=0;
+		    //var debug_count=0;
+		    var hate_you_flag=0;
+			var first_unit_len=0;
+			var second_unit_len=0;
+			var unit_height=0;	
+			var push_i=0;
+			for(push_i=0;push_i<map_arr_count;++push_i)
+			{
+				arr=store_map_arr[push_i].split("$");
+    			len=Number(arr[0]);
+    			if( (begin)>=(offset-50+theta_y)*1024&&(begin)<(offset+51+theta_y)*1024 ){
+    				some_line_len+=len;
+    				//if(++debug_count>20)return;
+					//console.log(some_line_len+"+"+len);
+					if(some_line_len%1024>front_i||some_line_len%1024==0){
+						if(hate_you_flag==0){
+							context1.fillStyle=arr[1];
+			    			context1.beginPath();
+			    			first_unit_len=(some_line_len%1024-front_i);
+			    			unit_height=some_line_len%1024==0?some_line_len/1024-1:parseInt(some_line_len/1024);
+			    			//console.log(first_unit_len+"+"+unit_height+"+"+arr[1]);
+			    			context1.fillRect(0,unit*(mirror-unit_height),unit*(first_unit_len>101?101:first_unit_len),unit);
+							context1.stroke(); 
+							context1.closePath();
+							hate_you_flag=1;
+						}else{
+							//console.log("                oooo"+first_unit_len+"+"+second_unit_len);
+	    					if(first_unit_len < 101&&first_unit_len+second_unit_len!=101){
+								if(some_line_len%1024==0){
+									first_unit_len=(1024-front_i-len);
+				    				second_unit_len=(1024-second_i)>0?(second_i-(1024-len)):len;
+	    							//console.log("                !!"+arr[1]+"+"+first_unit_len+"+"+second_unit_len);
+	    							
+	    							context1.fillStyle=arr[1];
+					    			context1.beginPath();
+					    			unit_height=some_line_len%1024==0?some_line_len/1024-1:parseInt(some_line_len/1024);
+				    			
+					    			context1.fillRect(unit*(first_unit_len),unit*(mirror-unit_height),unit*(second_unit_len),unit);
+									context1.stroke(); 
+									context1.closePath();
+								}else{
+	    							first_unit_len=(some_line_len%1024-front_i-len);
+				    				second_unit_len=(some_line_len%1024-second_i)>0?(second_i-(some_line_len%1024-len)):len;
+	    							//console.log("                "+arr[1]+"+"+first_unit_len+"+"+second_unit_len);
+	    							
+	    							context1.fillStyle=arr[1];
+					    			context1.beginPath();
+					    			unit_height=some_line_len%1024==0?some_line_len/1024-1:parseInt(some_line_len/1024);
+				    			
+					    			context1.fillRect(unit*(first_unit_len),unit*(mirror-unit_height),unit*(second_unit_len),unit);
+									context1.stroke(); 
+									context1.closePath();
+								}
+							}
+							if(some_line_len%1024==0){
+	    						hate_you_flag=0;
+	    						second_unit_len=0;
+	    					}
+						}
+					}else{
+						hate_you_flag=0;	
+					}
+				}
+				begin+=len;
+			}
+
+    		context1.lineWidth = 3;
+			context1.strokeStyle="#000000";
+			context1.strokeRect(0,0,DRAW_WIDTH,DRAW_WIDTH);
+	  	}
+	  	
+	  	function move_map(mode){
+			if(mode==1){//上
+				theta_y-=Number($("#offset1").val());
+			}else if(mode==2){//下
+				theta_y+=Number($("#offset2").val());
+			}else if(mode==3){//左
+				theta_x+=Number($("#offset3").val());
+			}else if(mode==4){//右
+				theta_x-=Number($("#offset4").val());
+				
+			}	  		
+	  		push_map();
+	  	}
+	  	
+	  	function draw_bottom_map()
+		{
+			setTimeout(function(){
+	    		$.ajax({
+					url:"/slampic/json/map_file.json",//json文件位置
+					type: "GET",//请求方式为get
+					dataType: "json", //返回数据格式为json
+					async: false,
+					success: function(data) {//请求成功完成后要执行的方法 
+						$.each(data.Results, function (i, Result) {
+			    			if(Result.val!="head"){
+			    				store_map_arr[map_arr_count]=Result.val;
+			    				++map_arr_count;
+			    			}
+			    		});
+			    		push_map();
+			    	}
+			    });
+		    },1000);
+		}
+		function draw_code(v){
+			fun_code=v;
+		}
+		
+		function draw_one_point(x,y){
+			context1.fillStyle="#000000";
+			context1.beginPath();
+			context1.fillRect(unit*x,unit*y,unit,unit);
+			context1.stroke(); 
+			context1.closePath();
+		}
+		function clear_one_point(x,y){
+			context1.fillStyle="#FFFFFF";
+			context1.beginPath();
+			context1.fillRect(unit*x,unit*y,unit,unit);
+			context1.stroke(); 
+			context1.closePath();
+		}
+		
+		function draw_small_line(x1,y1,x2,y2){
+			if(x1-x2>1||x1-x2<-1||y1-y2>1||y1-y2<-1){
+				//console.log(Math.floor((x1+x2)/2)+"+"+Math.floor((y1+y2)/2));
+				draw_one_point(Math.floor((x1+x2)/2),Math.floor((y1+y2)/2));
+				draw_small_line(Math.floor((x1+x2)/2),Math.floor((y1+y2)/2),x2,y2);
+				draw_small_line(x1,y1,Math.floor((x1+x2)/2),Math.floor((y1+y2)/2));
+			}
+		}
+		
+		
+		function draw_big_line(x1,y1,x2,y2){
+			var mx=(x1+x2)/2;
+			var my=(y1+y2)/2;
+			var dis_arr=new Array();	
+			var flag_arr=new Array();
+			dis_arr[0]=get_diff(x1,y1,x2,y2,mx-1,my-1);
+			dis_arr[1]=get_diff(x1,y1,x2,y2,mx,my-1);
+			dis_arr[2]=get_diff(x1,y1,x2,y2,mx+1,my-1);
+			dis_arr[3]=get_diff(x1,y1,x2,y2,mx+1,my);
+			dis_arr[4]=get_diff(x1,y1,x2,y2,mx+1,my+1);
+			dis_arr[5]=get_diff(x1,y1,x2,y2,mx,my+1);
+			dis_arr[6]=get_diff(x1,y1,x2,y2,mx-1,my+1);
+			dis_arr[7]=get_diff(x1,y1,x2,y2,mx-1,my);
+			flag_arr[0]=get_diff(x1,y1,x2,y2,mx-1,my-1);
+			flag_arr[1]=get_diff(x1,y1,x2,y2,mx,my-1);
+			flag_arr[2]=get_diff(x1,y1,x2,y2,mx+1,my-1);
+			flag_arr[3]=get_diff(x1,y1,x2,y2,mx+1,my);
+			flag_arr[4]=get_diff(x1,y1,x2,y2,mx+1,my+1);
+			flag_arr[5]=get_diff(x1,y1,x2,y2,mx,my+1);
+			flag_arr[6]=get_diff(x1,y1,x2,y2,mx-1,my+1);
+			flag_arr[7]=get_diff(x1,y1,x2,y2,mx-1,my);
+			var f1=0;
+			var f2=0;
+			var hate_you=0;
+			dis_arr.sort(NumDescSort);
+			var i=0;
+			for(i=0;i<8;++i){
+				//console.log(dis_arr[i]);
+				if(dis_arr[0]!=dis_arr[1]){
+					if(flag_arr[i]==dis_arr[0]){
+						f1=i;
+					}
+					if(flag_arr[i]==dis_arr[1]){
+						f2=i;
+					}
+				}else{
+					if(hate_you==0&&flag_arr[i]==dis_arr[0]){
+						f1=i;
+						hate_you=1;
+					}
+					if(hate_you==1&&flag_arr[i]==dis_arr[0]){
+						f2=i;
+					}
+				}
+			}	
+			//console.log(f1);
+			//console.log(f2);
+			draw_big_line_direction(x1,y1,x2,y2,f1);
+			draw_big_line_direction(x1,y1,x2,y2,f2);
+			
+		}
+		
+		
+		function draw_big_line_direction(x1,y1,x2,y2,dir){
+			if(dir==0)draw_small_line(x1-1,y1-1,x2-1,y2-1);
+			if(dir==1)draw_small_line(x1,y1-1,x2,y2-1);
+			if(dir==2)draw_small_line(x1+1,y1-1,x2+1,y2-1);
+			if(dir==3)draw_small_line(x1+1,y1,x2+1,y2);
+			if(dir==4)draw_small_line(x1+1,y1+1,x2+1,y2+1);
+			if(dir==5)draw_small_line(x1,y1+1,x2,y2+1);
+			if(dir==6)draw_small_line(x1-1,y1+1,x2-1,y2+1);
+			if(dir==7)draw_small_line(x1-1,y1,x2-1,y2);
+				
+		}
+		
+		
+		function get_diff(x1,y1,x2,y2,mx,my){
+			return Math.abs(get_dis(x1,y1,mx,my)-get_dis(mx,my,x2,y2));
+		}
+		function get_dis(x1,y1,x2,y2){
+			return dis=Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+		}
+		function NumDescSort(a,b)
+		{
+			return a - b;
+		}
+		
+		
+		function draw_fang(x1,y1,x2,y2){
+			context1.fillStyle="#000000";
+			context1.beginPath();
+			context1.fillRect(unit*(x1-2),unit*(y1-2),unit*(x2-x1+5),unit*3);
+			context1.stroke(); 
+			context1.closePath();
+       		context1.fillStyle="#000000";
+			context1.beginPath();
+			context1.fillRect(unit*(x1-2),unit*(y2),unit*(x2-x1+5),unit*3);
+			context1.stroke(); 
+			context1.closePath();
+			context1.fillStyle="#000000";
+			context1.beginPath();
+			context1.fillRect(unit*(x1-2),unit*(y1),unit*(3),unit*(y2-y1+2));
+			context1.stroke(); 
+			context1.closePath();
+			context1.fillStyle="#000000";
+			context1.beginPath();
+			context1.fillRect(unit*(x2),unit*(y1),unit*(3),unit*(y2-y1+2));
+			context1.stroke(); 
+			context1.closePath();
+       		
+		}
+		
+		function clear_fang(x1,y1,x2,y2){
+			context1.fillStyle="#FFFFFF";
+			context1.beginPath();
+			context1.fillRect(unit*(x1),unit*(y1),unit*(x2-x1+1),unit*(y2-y1+1));
+			context1.stroke(); 
+			context1.closePath();
+		}
+		
+		function save_map_file(x1,y1,x2,y2){
+			$.ajax({
+			    type: "POST",
+			    url: "/sankobot/main.xp",
+			    dataType:'json',
+			    data:{
+			        'Fun':'save_map_file',
+			        'fun_code':fun_code,
+			        'x1':x1-50+theta_x,
+			        'y1':50-y1+theta_y,
+			        'x2':x2-50+theta_x,
+			        'y2':50-y2+theta_y,
+			        'x_offset':511,
+			        'y_offset':511,
+			        'a':1
+			    },
+			    success: function (data){
+			        if(data.status!="ok")
+			        	alert(data.status);
+			    },
+			    error:function(){
+			    	
+			    }
+			}); 
+		}	
+		
+		function disableRefresh(evt){
+			evt = (evt) ? evt : window.event;
+			evt.stopPropagation();
+			//evt.preventDefault();
+			if (evt.keyCode) {
+				if(evt.keyCode == 65){			//A
+					 
+				}
+				if(evt.keyCode == 66){			//B
+					 
+				}
+				if(evt.keyCode == 68){			//D
+					 
+				}
+				if(evt.keyCode == 72){			//Hide隐藏轨迹
+					//72 H	
+					if($("#canvas1")[0].style.display=="none"){
+						$("#canvas1")[0].style.display="block";
+					}else{
+						$("#canvas1")[0].style.display="none";
+					}
+				}
+				if(evt.keyCode == 32){			//Space
+					 
+				}
+				
+				
+				if(evt.keyCode == 37&&evt.ctrlKey){			//地图左移  
+					//37 left			
+					move_map(3)
+				}
+				if(evt.keyCode == 38&&evt.ctrlKey){			//地图上移
+					//38 up  			
+					move_map(1);
+				}
+				if(evt.keyCode == 39&&evt.ctrlKey){			//地图右移
+					//39 right			
+					move_map(4);
+				}
+				if(evt.keyCode == 40&&evt.ctrlKey){			//地图下移
+					//40 down			
+					move_map(2);
+				}
+				
+				
+			}
+		}	
+		function goto_grid_map(){
+			window.location.href = '/san/grid_map.htm';	
+		}
+		function goto_big_map(){
+			window.location.href = '/san/snake_map.htm';	
+		}
+		function reflash_map(){
+			window.location.href = '/san/snake_map_edit.htm';	
+		}
+		
+		</script>
+	</head>
+	
+    <body style="overflow-x: hidden;">
+        <div id="content" class="white">
+            <h1 style="margin:0px 0px 0px 10px;"><img src="/icons/bookmarks-2.png" alt="" />
+            	&nbsp;&nbsp;&nbsp;SanKobot
+            </h1>
+            <div class="bloc"style="position: relative;top: -60px;">
+                <div class="title" style="z-index: 110;">
+                	<p>
+                    	<font color="#009100" id="version_val"style="font-size: smaller;">
+  	                    	<span style="left:10px;position:relative;">x</span>
+  	                    	<input id="draw_x" type="text" class="input" style="width:80px;left:15px;top:-2px;position:relative;height:28px;" value="" >
+							<span style="left:30px;position:relative;">y</span>
+							<input id="draw_y" type="text" class="input" style="width:80px;left:35px;top:-2px;position:relative;height:28px;" value="" >
+							<button "type="button" class="button black1"style="width:80px;left:70px;top:2px;" onclick="draw_code(1)">点</button>
+               				<button "type="button" class="button black1"style="width:80px;left:90px;top:2px;" onclick="draw_code(2)">细线</button>
+               				<button "type="button" class="button black1"style="width:80px;left:110px;top:2px;" onclick="draw_code(3)">粗线</button>
+               				<button "type="button" class="button black1"style="width:80px;left:130px;top:2px;" onclick="draw_code(4)">矩形</button>
+               				<button "type="button" class="button black1"style="width:80px;left:150px;top:2px;" onclick="draw_code(5)">清除点</button>
+               				<button "type="button" class="button black1"style="width:80px;left:170px;top:2px;" onclick="draw_code(6)">清除矩形</button>
+               				<button "type="button" class="button black1"style="width:80px;left:190px;top:2px;" onclick="can_not_save_map()">未定义</button>
+               				<button "type="button" class="button black1"style="width:80px;left:210px;top:2px;" onclick="draw_code(0)">释放</button>
+               				<button "type="button" class="button black1"style="width:80px;left:230px;top:2px;" onclick="reflash_map()">刷新</button>
+               				<button "type="button" class="button black1"style="width:80px;left:147px;top:45px;" onclick="goto_big_map()">大地图</button>
+               				<button "type="button" class="button black1"style="width:80px;left:64px;top:90px;" onclick="goto_grid_map()">栅格图</button>
+               				<input id="offset1" type="text" class="input" style="width:80px;left:76px;top:132px;position:relative;height:28px;" value="5" >
+							<button "type="button" class="button black1"style="width:80px;left:-102px;top:135px;" onclick="move_map(1)">↑</button>			
+               				<input id="offset2" type="text" class="input" style="width:80px;left:-91px;top:177px;position:relative;height:28px;" value="5" >
+							<button "type="button" class="button black1"style="width:80px;left:-270px;top:180px;" onclick="move_map(2)">↓</button>
+               				
+               				<input id="offset3" type="text" class="input" style="width:80px;left:-258px;top:224px;position:relative;height:28px;" value="5" >
+							<button "type="button" class="button black1"style="width:80px;left:-436px;top:225px;" onclick="move_map(3)">←</button>
+               				
+               				<input id="offset4" type="text" class="input" style="width:80px;left:1182px;top:233px;position:relative;height:28px;" value="5" >
+							<button "type="button" class="button black1"style="width:80px;left:1004px;top:235px;" onclick="move_map(4)">→</button>
+               				
+  	                    </font>
+                    			
+                    </p>
+                </div>                 
+                <div class="content" style="">
+                    <div class="input">
+                    	
+                    	
+                    	<div id=""style="top:66px;z-index: 100;position: absolute;left: 35px;">
+                        	<canvas id="canvas1"  style="width:1005px;height:1005px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        <div id=""style="top:66px;z-index: 100;position: absolute;left: 35px;">
+                        	<canvas id="canvas2"  style="width:1005px;height:1005px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        <div id="grid_line"style="top:66px;z-index: 110;position: absolute;left: 35px;">
+                        	<canvas id="canvas3"  style="width:1005px;height:1005px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        		
+                        
+	                </div>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+	        document.onmousedown = function (e) {
+				//e.preventDefault();
+				e = e || window.event;
+			    if(Math.floor((e.clientY-76+$(window).scrollTop())/10)<0){
+					return;
+			    }else{
+			    	pix_x = e.clientX-42;
+			    	pix_y = e.clientY-76+$(window).scrollTop();
+			    	pos_x = Math.floor(pix_x/10);
+			    	pos_y = Math.floor(pix_y/10);
+			    	if(fun_code==1){				//画点
+			    		draw_one_point(pos_x,pos_y);
+			    		save_map_file(pos_x,pos_y,0,0);
+			    	}
+			    	if(fun_code==2){				//画细线
+			    		if(p_count==0){
+			    			p1x=pos_x;
+			    			p1y=pos_y;
+			    			p_count=1;
+			    			draw_one_point(p1x,p1y);	
+			    		}else{
+			    			p2x=pos_x;
+			    			p2y=pos_y;
+			    			p_count=0;
+			    			draw_one_point(p2x,p2y);
+			    			draw_small_line(p1x,p1y,p2x,p2y);
+			    			save_map_file(p1x,p1y,p2x,p2y);	
+			    		}
+			    	}
+			    	if(fun_code==3){				//画粗线
+			    		if(p_count==0){
+			    			p1x=pos_x;
+			    			p1y=pos_y;
+			    			p_count=1;
+			    			draw_one_point(p1x,p1y);	
+			    		}else{
+			    			p2x=pos_x;
+			    			p2y=pos_y;
+			    			p_count=0;
+			    			draw_one_point(p2x,p2y);
+			    			draw_small_line(p1x,p1y,p2x,p2y);
+			    			draw_big_line(p1x,p1y,p2x,p2y);	
+			    			save_map_file(p1x,p1y,p2x,p2y);	
+			    		}
+			    	}
+			    	if(fun_code==4){				//画矩形
+			    		if(p_count==0){
+			    			p1x=pos_x;
+			    			p1y=pos_y;
+			    			p_count=1;
+			    			draw_one_point(p1x,p1y);	
+			    		}else{
+			    			p2x=pos_x;
+			    			p2y=pos_y;
+			    			p_count=0;
+			    			draw_one_point(p2x,p2y);
+			    			draw_fang(p1x,p1y,p2x,p2y);
+			    			save_map_file(p1x,p1y,p2x,p2y);	
+			    		}
+			    	}
+			    	if(fun_code==5){				//清除点
+			    		clear_one_point(pos_x,pos_y);
+			    		save_map_file(pos_x,pos_y,0,0);
+			    	}
+			    	if(fun_code==6){				//清除矩形
+			    		if(p_count==0){
+			    			p1x=pos_x;
+			    			p1y=pos_y;
+			    			p_count=1;
+			    			draw_one_point(p1x,p1y);	
+			    		}else{
+			    			p2x=pos_x;
+			    			p2y=pos_y;
+			    			p_count=0;
+			    			//draw_one_point(p2x,p2y);
+			    			clear_fang(p1x,p1y,p2x,p2y);
+			    			save_map_file(p1x,p1y,p2x,p2y);	
+			    		}
+			    	}
+			    	
+			    	if(DRAW_HEAD_LOG==1){
+			    		console.log(pix_x+"+"+pix_y+"pix--pos"+(pos_x)+"+"+(pos_y));	
+			    	}
+			    	$("#draw_x").val(pos_x-50+theta_x);
+			    	$("#draw_y").val(50-pos_y+theta_y);
+			    		
+			    }
+			};
+			document.onmousemove = function (e) {
+
+			    
+			}; 
+		    document.onmouseup = function (e) {
+		    	e.preventDefault();
+		    	
+		    }; 
+		    
+		</script>
+    </body>

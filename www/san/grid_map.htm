@@ -1,0 +1,685 @@
+﻿<html>
+	<head>
+		<TITLE>SanKoBot</TITLE>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="/js/jquery1.6.min.js"></script>
+	<script type="text/javascript" src="/jsLib/jqueryui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/jsLib/jqueryui/jqueryui.css" />
+	<script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	<link rel="shortcut icon" type="image/x-icon" href="/msa/logo.ico" />
+
+	<script type="text/javascript" src="/js/bctech_checkbox.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/bctech_checkbox.css">
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/js/waiteffect.js"></script>
+	<script type="text/javascript" src="/js/pubvalidate.js"></script>
+	<script type="text/javascript" src="/jsLib/sankobot.js"></script>
+	<style type="text/css">
+		
+		#content table tbody tr td {
+			border-bottom: 1px solid rgba(0,0,0,0);;
+			border-top: 1px solid rgba(0,0,0,0);
+		}
+		#content table tbody tr:nth-child(2n+1) td {
+			background-color: rgba(0,0,0,0);
+		}
+		
+	</style>	  
+	  
+	<script type="text/javascript">
+		var Hz=300;
+		var fp_map_offset=0; 
+		var canvas1;
+  		var canvas2;
+  		var canvas3;
+  		var canvas4;
+  		var canvas5;
+  		var canvas6;
+  		var canvas1_1;
+		var context1_1;
+  		var context1;
+		var context2;
+		var context3;
+		var context4;
+		var context5;
+		var context6;
+  		var img_id=1;
+  		var scale=50;			//	mm/像素
+  		var unit=3;
+	  	var tii=0;
+	  	var radius=3;
+	  	var ii_count=0;			//	判断是实时显示还是离线地图
+	  	//unit=2
+	  	//24寸屏幕 
+	  	//1820/unit/20		*		840/unit/20=45.5M*21M=955平方
+	  	//14存屏幕
+	  	//1180/unit/20		*		480/unit/20=29.5M*12M=354平方
+	  	var can_width=(window.screen.availWidth-70);
+	  	var can_height=(window.screen.availHeight-180); 
+	  	var x_offset_coefficient=0.8;
+	  	var y_offset_coefficient=0.8;
+	  	var x_offset=can_width*x_offset_coefficient*Math.round(25/unit);//25=scale/2
+  		var y_offset=can_height*y_offset_coefficient*Math.round(25/unit);  
+  		var status_color;
+	  	var line_speed=700;
+	  	var map_points_arr=new Array();
+		var map_points_count=0;
+		var min_x=can_width;
+		var min_y=can_height;
+		var max_x=0;
+		var max_y=0;
+		var zoom_tii=0;
+		var target_x=0;
+		var target_y=0;
+	  	var all_time_count=0;
+	  	var all_time_pause=0;
+	  	var fp_item_offset=0;
+		$(document).ready(function() {
+	  		init_canvas(can_width,can_height);
+	  		window.document.onkeydown = disableRefresh;
+			initdata();
+			play_video();
+	  	});
+	  	
+		 
+		function initdata(){
+	  		//设置页面的宽度和高度
+	  		$(".content")[0].style.height=can_height+50;	  		
+	  		$(".bloc")[0].style.width=can_width+90;	  		
+	  		//设置背景
+	  		var lGradient = context6.createLinearGradient(0,0,can_width,0);
+			lGradient.addColorStop(0,'#e0e0e0');
+			lGradient.addColorStop(1,'#d0d0d0');
+			context6.fillStyle = lGradient;
+			context6.fillRect(0,0,can_width,can_height);
+			//画出网格线
+			draw_white_grid(100,5);
+			//显示版本号
+			get_version();
+			ctrl_global();
+			//初始化地图文件(为加速做准备)
+			init_map_file();
+			//get_current_data();
+	  	}
+	  	
+	  	function mycon(a,b)
+	  	{
+	  		console.log(a+"="+b);	
+	  	}
+	  	
+	  	function disableRefresh(evt){
+			evt = (evt) ? evt : window.event;
+			evt.stopPropagation();
+			evt.preventDefault();
+			if (evt.keyCode) {
+				all_time_pause=1;
+				if(evt.keyCode == 83){					//Stop停车
+					//83 S
+					ctrl_cleanner_robot(0,line_speed,0);
+				}
+				if(evt.keyCode == 87){					//Wall沿墙
+					//87 W
+					if(!evt.shiftKey){
+						ctrl_cleanner_robot(1,line_speed,0);
+					}
+				}
+				if(evt.keyCode == 65){					//Auto自动模式
+					//65 A
+					if(!evt.shiftKey){
+						all_time_pause=0;
+						all_time_count=0;
+						ctrl_cleanner_robot(2,line_speed,0);
+					}
+				}
+				if(evt.keyCode == 80){					//Point定点清扫
+					//80 P
+					if(!evt.shiftKey){
+						ctrl_cleanner_robot(3,line_speed,0);
+					}
+				}
+				if(evt.keyCode == 68){					//Dock回冲
+					//68 D
+					if(!evt.shiftKey){
+						ctrl_cleanner_robot(4,line_speed,0);
+					}
+				}
+				if(evt.keyCode == 32||evt.keyCode == 101){//暂停
+					//32 space			101	5
+					ctrl_cleanner_robot(5,line_speed,0);
+				}
+				if(evt.keyCode == 38||evt.keyCode == 104){//前进
+					//38 up  			104	8
+					if(!evt.ctrlKey){
+						ctrl_cleanner_robot(6,$("#line_val").val(),0);
+					}
+				}
+				if(evt.keyCode == 40||evt.keyCode == 98){//后退
+					//40 down			98	2
+					if(!evt.ctrlKey){
+						ctrl_cleanner_robot(7,$("#line_val").val(),0);
+					}
+				}
+				if(evt.keyCode == 37||evt.keyCode == 100){//左旋
+					//37 left			100	4
+					if(!evt.ctrlKey){
+						ctrl_cleanner_robot(8,$("#angle_val").val(),0);
+					}
+				}
+				if(evt.keyCode == 39||evt.keyCode == 102){//右旋
+					//39 right			102	6
+					if(!evt.ctrlKey){
+						ctrl_cleanner_robot(9,$("#angle_val").val(),0);
+					}
+				}
+				if(evt.keyCode == 71){					//A-B(Go)
+					//71 G
+					if(!evt.shiftKey){
+						goto_ab(target_x,target_y,line_speed);
+					}
+				}
+				if(evt.keyCode == 90){					//工字直行
+					//90 Z
+					//ctrl_cleanner_robot(11,line_speed,0);
+				}
+				if(evt.keyCode == 88){					//工字左转
+					//88 X
+					//ctrl_cleanner_robot(12,line_speed,0);
+				}
+				if(evt.keyCode == 67){					//工字右转
+					//67 C
+					//ctrl_cleanner_robot(13,line_speed,0);
+				}
+				if(evt.keyCode == 78){					//工字形清扫
+					//78 N
+					ctrl_cleanner_robot(14,line_speed,0);
+				}
+				if(evt.keyCode == 82){					//RES
+					//82 R
+					if(!evt.shiftKey){
+						ctrl_cleanner_robot(15,line_speed,0);
+					}
+				}
+				
+				if(evt.keyCode == 87&&evt.shiftKey){		//Wall沿墙-P
+					//87 W
+					ctrl_cleanner_robot(21,line_speed,0);
+				}
+				if(evt.keyCode == 65&&evt.shiftKey){		//Auto自动模式-P
+					//65 A
+					ctrl_cleanner_robot(22,line_speed,0);
+				}
+				if(evt.keyCode == 80&&evt.shiftKey){		//Point定点清扫-P
+					//80 P
+					ctrl_cleanner_robot(23,line_speed,0);
+				}
+				if(evt.keyCode == 68&&evt.shiftKey){		//Dock回冲-P
+					//68 D
+					ctrl_cleanner_robot(24,line_speed,0);
+				}
+				if(evt.keyCode == 71&&evt.shiftKey){		//A-B(Go)-P
+					//71 G
+					ctrl_cleanner_robot(25,line_speed,0);
+				}
+				if(evt.keyCode == 82&&evt.shiftKey){		//RES-P
+					//82 R
+					ctrl_cleanner_robot(26,line_speed,0);
+				}
+				
+				if(evt.keyCode == 72){					//Hide隐藏轨迹
+					//72 H	
+					if($("#canvas2")[0].style.display=="none"){
+						$("#canvas2")[0].style.display="block";
+					}else{
+						$("#canvas2")[0].style.display="none";
+					}
+				}
+				if(evt.keyCode == 72&&evt.ctrlKey){		//Ctrl+Hide隐藏行走区域
+					//72 H	
+					if($("#canvas4")[0].style.display=="none"){
+						$("#canvas4")[0].style.display="block";
+					}else{
+						$("#canvas4")[0].style.display="none";
+					}
+					if($("#canvas1")[0].style.display=="none"){
+						$("#canvas1")[0].style.display="block";
+					}else{
+						$("#canvas1")[0].style.display="none";
+					}
+				}
+				
+				if(evt.keyCode == 86){					//Video可视化界面变大变小
+					//86 V
+					
+					if($("#play_img")[0].style.width=="640px"){
+						$("#play_img")[0].style.width=320;
+						$("#play_img")[0].style.height=190;
+						$("#play_map")[0].style.width=320;
+						$("#play_map")[0].style.height=190;
+						$("#play_map")[0].style.top=190;
+						$("#play_map")[0].style.left=-324;
+					}else{
+						$("#play_img")[0].style.width=640;
+						$("#play_img")[0].style.height=380;
+						$("#play_map")[0].style.width=640;
+						$("#play_map")[0].style.height=380;
+						$("#play_map")[0].style.top=0;
+						$("#play_map")[0].style.left=-4;
+					}	
+				}
+				
+				
+				
+				if(evt.keyCode == 37&&evt.ctrlKey){			//地图左移  
+					//37 left			
+						zoom_direction(4);
+				}
+				if(evt.keyCode == 38&&evt.ctrlKey){			//地图上移
+					//38 up  			
+					zoom_direction(3);
+				}
+				if(evt.keyCode == 39&&evt.ctrlKey){			//地图右移
+					//39 right			
+					zoom_direction(1);
+				}
+				if(evt.keyCode == 40&&evt.ctrlKey){			//地图下移
+					//40 down			
+					zoom_direction(2);
+				}
+
+				if(evt.keyCode == 107&&evt.ctrlKey){		//放大地图
+					//107+				
+					zoom_bigger();
+				}
+				if(evt.keyCode == 109&&evt.ctrlKey){		//缩小地图
+					//109-				
+					zoom_smaller();
+				}
+				
+				if(evt.keyCode == 84){					//Ting停止网页
+					//83 T
+					stop_web_ui_process();
+				}
+				
+			}
+		}
+	  	
+	  	function stop_web_ui_process(){
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'stop_web_ui_process',
+	                'a':1
+	            },
+	            success: function (data){
+	            	
+	            	
+	            },
+	            error:function(){
+	            	
+	            }
+	        });
+	  	}
+	  	function get_version(){
+	  		var config_path="/etc/skc/config/.config";
+	  		$("#version_val").html("栅格图(电脑版本)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;版本号=version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;设备型号=type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+	  		//"地图点总数=total_point_count&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;距离异常点=dis_unusual_count&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;角度异常点=theta_unusual_count&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;距离最大值=max_dis_xy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;角度最大值=max_theta&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;距离平均值=average_dis_xy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;角度平均值=average_theta");	
+	  		get_config_val(config_path,"version");
+	  		get_config_val(config_path,"type");
+	  	}
+	  	//画出精度计算标记点
+		function draw_pos(x,y,c1,c2,txt)
+		{
+			context2.beginPath();
+		    context2.strokeStyle = c1;
+		    context2.arc(unit*x,unit*y,unit*radius,0,2*Math.PI,true);
+		    context2.closePath();
+		    context2.fillStyle = c2;
+		    context2.fill(); 
+			context2.font = "bold 24px Arial";
+			context2.fillStyle = "#8600FF";
+			context2.fillText(txt, unit*x-10, unit*y-15);
+		}
+	  	function add_point()
+		{
+			var order=new Array("O","A","B","C","D","E","F","G","H","I","J","K","L","M","N","P","Q","R","S","T","U","V","W","X");
+			var tab = $("#point_container dt span").length;
+			$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'calculate_point',
+	                'slam_x':$("#slam_x").val(),
+	                'slam_y':$("#slam_y").val(),
+	                'theta':$("#theta").val(),
+	                'no':Number(tab)+1,
+	                'a':1
+	            },
+	            success: function (data){
+                    if(data.status=="ok"){
+                    	var p_x=Math.round((x_offset+Number($("#slam_x").val()))/scale);
+  						var p_y=Math.round((y_offset-Number($("#slam_y").val()))/scale);
+  						draw_pos(p_x,p_y,'#8600FF','#8600FF',order[tab]);
+                		if(Number(tab)==0){
+                    		var a = "第"+(Number(tab)+1)+"个点"+order[tab];
+                    		var b = "("+$("#slam_x").val()+","+$("#slam_y").val()+","+$("#theta").val()+")&nbsp;&nbsp;&nbsp;"+"OO"+"="+data.dis;	
+                    		draw_point(a,b);
+                    	}else{
+                    		var a = "第"+(Number(tab)+1)+"个点"+order[tab];
+                    		var b = "("+$("#slam_x").val()+","+$("#slam_y").val()+","+$("#theta").val()+")&nbsp;&nbsp;&nbsp;"+order[tab-1]+order[tab]+"="+data.dis;	
+                    		draw_point(a,b);
+                    	}
+                    	
+                    }
+	            },
+	            error:function(){
+	            	
+	            }
+	        });
+			
+			
+		}
+		function draw_point(a,b)
+		{
+			if($('#point_container dt span').length<=24)
+			{
+				//<img src='/images/delete.png' onclick='$(this).parent().remove();' />
+				$("#point_container").append("<dt class='point_item' onmouseover='$(this).children(\"img\").show();' onmouseout='$(this).children(\"img\").hide();' ><span>" + a + "&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;" + b + "</span> </dt>");
+			}
+			else
+			{
+				$.messager.alert('系统提示','点的数量不能超过24个！');
+			}
+		}
+		function zoom_every_s(){
+			if(zoom_tii==1){
+				return;
+			}
+			var map_min_x=Math.round((x_offset+Number(min_x))/scale);
+	  		var map_min_y=Math.round((y_offset-Number(min_y))/scale);
+	  		var map_max_x=Math.round((x_offset+Number(max_x))/scale);
+	  		var map_max_y=Math.round((y_offset-Number(max_y))/scale);
+	  		console.log("a="+map_min_x+"b="+map_min_y+"c="+map_max_x+"d="+map_max_y);
+	  		//console.log("a="+min_x+"b="+min_y+"c="+max_x+"d="+max_y);
+	  		//console.log("a="+min_x+"c="+max_x);   
+	  		setTimeout("zoom_every_s()",1000);	
+		}
+		
+		
+		
+		
+		function zoom_bigger(){
+			++unit;
+			if(unit==11){
+				--unit;
+				return;
+			}
+			x_offset=can_width*x_offset_coefficient*Math.round(25/unit);
+			y_offset=can_height*y_offset_coefficient*Math.round(25/unit);
+			zoom_unit();
+		}
+		function zoom_smaller(){
+			--unit;
+			if(unit==0){
+				++unit;
+				return;
+			}
+			x_offset=can_width*x_offset_coefficient*Math.round(25/unit);
+			y_offset=can_height*y_offset_coefficient*Math.round(25/unit);
+			zoom_unit();
+		}
+		function zoom_direction(direction){
+			//left
+			if(direction==1){
+				x_offset_coefficient-=0.1;
+		  		x_offset=can_width*x_offset_coefficient*Math.round(25/unit);
+		  		zoom_unit();
+			}
+			//up
+			if(direction==2){
+				y_offset_coefficient-=0.1;
+		  		y_offset=can_height*y_offset_coefficient*Math.round(25/unit); 
+		  		zoom_unit(); 
+			}
+			//down
+			if(direction==3){
+				y_offset_coefficient+=0.1;
+		  		y_offset=can_height*y_offset_coefficient*Math.round(25/unit); 
+		  		zoom_unit(); 
+			}
+			//right
+			if(direction==4){
+				x_offset_coefficient+=0.1;
+		  		x_offset=can_width*x_offset_coefficient*Math.round(25/unit);
+		  		zoom_unit();
+			}
+			
+			
+		}
+		function goto_map_file(){
+			window.location.href = '/san/snake_map_edit.htm';
+		}
+		function goto_save_log(){
+			window.location.href = '/san/save_log.htm';
+		}
+		</script>
+	</head>
+	
+    <body style="overflow-y: hidden;overflow-x: hidden;">
+        <div id="content" class="white">
+            <h1 style="margin:0px 0px 0px 10px;"><img src="/icons/bookmarks-2.png" alt="" />
+            	&nbsp;&nbsp;&nbsp;SanKobot
+            </h1>
+            <div class="bloc"style="position: relative;top: -60px;">
+                <div class="title" style="z-index: 110;">
+                	<p>
+                    	<font color="#009100" id="version_val"style="font-size: x-small;">
+  	                    	
+  	                    </font>
+                    	action
+						<input id="action" type="text" class="input" style="left: 0px;position: relative;width: 60px;height:28px" value="" >
+						mode
+						<input id="mode" type="text" class="input" style="left: 0px;position: relative;width: 60px;height:28px" value="" >
+						step
+						<input id="step" type="text" class="input" style="left: 0px;position: relative;width: 60px;height:28px" value="" >
+						<button type="button" class="button black1"style="display:none;width:70px;left:10px;" onclick="goto_save_log()">savelog</button>
+									
+                    </p>
+                </div>                 
+                <div class="content" style="">
+                    <div class="input">
+                    	<table id="point_table"class="input"style="z-index: 180;position: relative;top: -20px;left: 20px;/*display:none;*/">		
+							<tr>
+								
+                            	<td style="padding-left:10px;width: 20px;">sX</td>
+								
+								<td style="width: 60px;">
+									<input id="slam_x" type="text" class="input" style="left: 0px;position: relative;width: 60px;height:28px" value="" >
+								</td>
+								
+								
+								<td style="padding-left:10px;width: 20px;">sY</td>
+								<td style="width: 60px;">
+									<input id="slam_y" type="text" class="input" style="left: 0px;position: relative;width: 60px;height:28px" value="" >
+								</td>
+								<td style="padding-left:10px;width: 20px;">dX</td>
+								
+								<td style="width: 60px;">
+									<input id="goto_x" type="text" class="input" style="left: 0px;position: relative;width: 60px;height:28px" value="" >
+								</td>
+								
+								
+								<td style="padding-left:10px;width: 20px;">dY</td>
+								<td style="width: 60px;">
+									<input id="goto_y" type="text" class="input" style="left: 0px;position: relative;width: 60px;height:28px" value="" >
+								</td>
+								
+								<td style="padding-left:10px;width: 40px;">Theta</td>
+								<td style="width: 70px;">
+									<input id="theta" type="text" class="input" style="left: 0px;position: relative;width: 70px;height:28px" value="" >
+								</td>
+								
+								<td style="padding-left:10px;width: 40px;">status</td>
+								<td style="width: 20px;">
+									<input id="status" type="text" class="input" style="left: 0px;position: relative;width: 20px;height:28px" value="" >
+							  	</td>
+							  	
+							  	<td style="padding-left:10px;width: 20px;">Time</td>
+								<td style="width: 70px;">
+									<input id="alltimecount" type="text" class="input" style="left: 0px;position: relative;width: 70px;height:28px" value="" >
+							  	</td>
+							  	
+							  	<td style="width: 70px;">
+									<button type="button" class="button black1"style="width:60px;float: right;" onclick="add_point()">add</button>
+               					</td> 
+               					
+               					
+                            	
+               					
+                            	<td style="padding-left:20px;width:30px;">line</td>
+								<td style="width: 70px;">
+									<select id="line_val" onchange="">
+                                        <option value="150" >150</option>
+                                        <option value="200" >200</option>
+                                        <option value="250" >250</option>
+                                        <option value="300" >300</option>
+                                        <option value="350" selected>350</option>
+                                        <option value="400" >400</option>
+                                        <option value="450" >450</option>
+                                        <option value="500" >500</option>
+                                        <option value="550" >550</option>
+                                        <option value="600" >600</option>
+                                        <option value="650" >650</option>
+                                        <option value="700" >700</option>
+                                    </select>
+								</td>
+							
+								<td style="width:40px;">angle</td>
+								<td style="width: 70px;">
+									<select id="angle_val" onchange="">
+                                        <option value="150" >150</option>
+                                        <option value="200" >200</option>
+                                        <option value="250" >250</option>
+                                        <option value="300" selected>300</option>
+                                        <option value="350" >350</option>
+                                        <option value="400" >400</option>
+                                        <option value="450" >450</option>
+                                        <option value="500" >500</option>
+                                        <option value="550" >550</option>
+                                        <option value="600" >600</option>
+                                        <option value="650" >650</option>
+                                        <option value="700" >700</option>
+                                    </select>
+                                </td>
+								
+								
+								<td style="width: 60px;"> 
+									<button type="button" class="button black1"style="width:50px;" onclick="zoom_bigger()">+</button>
+               					</td> 
+               					<td style="width: 60px;">
+									<button type="button" class="button black1"style="width:50px;" onclick="zoom_smaller()">-</button>
+               					</td> 
+               					<td style="width: 50px;">
+									<button type="button" class="button black1"style="width:50px;" onclick="zoom_direction(1)">←</button>
+               					</td> 
+               					<td style="width: 50px;">
+									<button "type="button" class="button black1"style="width:50px;top:-33px;left:15px;" onclick="zoom_direction(2)">↑</button>
+               					</td> 
+               					<td style="width: 50px;">
+									<button type="button" class="button black1"style="width:50px;left:-35px;" onclick="zoom_direction(3)">↓</button>
+               					</td> 
+               					<td style="width: 50px;">
+									<button "type="button" class="button black1"style="width:50px;left:-20px;" onclick="zoom_direction(4)">→</button>
+               					</td> 
+								<td style="width: 60px;">
+									<button "type="button" class="button black1"style="width:50px;left:0px;" onclick="read_me()">帮助</button>
+               					</td>
+               					<td style="width: 60px;">
+									<button "type="button" class="button black1"style="width:50px;left:0px;" onclick="goto_map_file()">map</button>
+               					</td> 
+								
+								<td >
+									  
+								</td>
+							</tr>
+							
+		            	</table>	
+                   		<!--可视化界面-->
+                   		<div id="move_video"style="top:66px;z-index: 150;position: absolute;left: 36px;">
+                        	<img id="play_img"src="/san/img/show_video.gif" onerror="" width="320" height="190">	
+                        	<img id="play_map"src="/san/img/show_video.gif" style="position:relative;top:190px;left:-324px;"onerror="" width="320" height="190">	
+                        	
+                        		
+							
+                        </div> 
+                    	<!--A到B按钮位置-->
+                        <div id="target"style="display:none;top:70px;z-index: 220;position: absolute;left: 30px;">
+                        	<img src="/san/img/target.gif" width="28" height="39">	
+                        </div> 
+                    	<div id="init_width_set"style="top:66px;z-index: 100;position: absolute;left: 35px;">
+                        	<canvas id="canvas1"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        
+                        <div style="top: 16px;z-index: 95;position: absolute;left: 35px;">
+                        	<canvas id="canvas1_1"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div>
+                        
+                        <div style="top: 16px;z-index: 90;position: absolute;left: 35px;">
+                        	<canvas id="canvas2"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+                        <div style="top: 16px;z-index: 60;position: absolute;left: 35px;">
+                        	<canvas id="canvas3"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+                        <div style="top: 16px;z-index: 80;position: absolute;left: 35px;">
+                        	<canvas id="canvas4"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+                        <div style="top: 16px;z-index: 70;position: absolute;left: 35px;">
+                        	<canvas id="canvas5"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+                        <div style="top: 16px;z-index: 50;position: absolute;left: 35px;">
+                        	<canvas id="canvas6"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+	                   	<div style="z-index: 200;position: absolute;right:100px;">
+                            <dl id="point_container"style="position: relative;left: -100px;">
+							</dl>
+						</div>
+	                    
+	                </div>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+	        document.onmousedown = function (e) {
+				//e.preventDefault();
+				e = e || window.event;
+			    var move_x = e.clientX-41;
+			    var move_y = e.clientY-71;
+			    if(move_x>0&&move_y>0&&move_x< 1463&&move_y<644){
+				    $("#target")[0].style.left=(move_x+24)+ "px";
+				    $("#target")[0].style.top= (move_y+26) + "px";
+				    target_x=Math.round((move_x)*scale/unit-x_offset);
+				    target_y=Math.round(y_offset-(move_y)*scale/unit);
+				    $("#goto_x").val(target_x);
+				    $("#goto_y").val(target_y);
+				    $("#target")[0].style.display="none";
+				}
+			};
+			document.onmousemove = function (e) {
+			   
+			}; 
+		    document.onmouseup = function (e) {
+		    	e.preventDefault();
+		    }; 
+			
+
+
+		</script>
+    </body>

@@ -1,0 +1,395 @@
+﻿<html>
+	<head>
+		<TITLE>err_count</TITLE>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/jsLib/easyui/icon.css">
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>      
+
+	<script type="text/javascript">
+		var canvas1;
+  		var context1;
+  		var map_points_arr=new Array();
+  		var scale=2;			
+  		var x_offset=800;
+  		var y_offset=600;  
+  		
+  		var canvas2;
+  		var context2;
+  		var led_points_arr=new Array();
+  		var led_scale=2;			
+  		var led_x_offset=-200;
+  		var led_y_offset=100;  
+  		
+
+	  	$(document).ready(function() {
+	  		canvas1=document.getElementById("canvas1"); 
+			context1=canvas1.getContext("2d");
+			canvas1.width=1600;canvas1.height=800;
+			$("#canvas1")[0].style.width =1600;
+			$("#canvas1")[0].style.height=800;
+
+
+			canvas2=document.getElementById("canvas2"); 
+			context2=canvas2.getContext("2d");
+			canvas2.width=1600;canvas2.height=800;
+			$("#canvas2")[0].style.width =1600;
+			$("#canvas2")[0].style.height=800;
+//			context2.lineWidth=3;
+//			context2.strokeStyle="#272727";
+//			context2.beginPath();
+//			context2.moveTo(100,100);
+//			context2.lineTo(200,200);
+//			context2.stroke(); 
+//			context2.closePath();
+			window.document.onkeydown = disableRefresh;
+	  	});
+	  	
+	  	function showdata1(){
+	  		$.ajax({
+		        type: "POST",
+		        url: "/sankobot/main.xp",
+		        dataType:'json',
+		        data:{
+		            'Fun':'show_red_led',
+		       		'a':1
+		        },
+		        success: function (data){
+		        	if(data.status=="ok"){
+		        		draw_map_point();
+		        		draw_led_point();
+		        	}else{
+		        		alert(data.status);
+		        	}
+		        },
+		        error:function(){
+		        	
+		        }
+    		});	
+	  	}
+	  	
+	  	function draw_map_point(){
+	  		$.ajax({
+				url:"/slampic/json/map_points.json",//json文件位置
+				type: "GET",//请求方式为get
+				dataType: "json", //返回数据格式为json
+				async: false,
+				success: function(data) {//请求成功完成后要执行的方法 
+		        	var ii = 0;
+		        	var x_val=0;
+		        	var y_val=0;
+		        	var yaw_val=0;
+		        	var arr;
+		    		var pre_x=0;
+		        	var pre_y=0;
+		        	$.each(data.Results, function (i, Result) {
+		    			setTimeout(function(){
+			    			if(Result.val!="head"){
+				    			map_points_arr[ii]=Result.val;
+				    			++ii;
+				    			arr=Result.val.split("$");
+				    			x_val=arr[0];y_val=arr[1];
+				    			yaw_val=Math.round(Number(arr[2])/100);
+				    			var map_x=Math.round((x_offset+Number(x_val))/scale);
+					  			var map_y=Math.round((y_offset-Number(y_val))/scale);
+					  			//draw_now_status(map_x,map_y,'#ff0000',0-yaw_val);//画轮廓
+					  			context1.lineWidth=3;
+								context1.strokeStyle="#272727";
+				            	context1.beginPath();
+				    			if(ii==1)
+				            	{
+				            		pre_x=Number(map_x);
+									pre_y=Number(map_y);
+				            	}
+				            	else
+				            	{
+				            		context1.moveTo(pre_x,pre_y);
+				            		context1.lineTo(Number(map_x),Number(map_y));
+				            		pre_x=Number(map_x);
+									pre_y=Number(map_y);
+				            	}
+								context1.stroke(); 
+				           		context1.closePath();
+				  			}
+			  			},5*i);
+		            });
+				}
+			});	
+	  	}
+	  	
+		function draw_led_point(){
+	  		$.ajax({
+				url:"/slampic/json/led_points.json",//json文件位置
+				type: "GET",//请求方式为get
+				dataType: "json", //返回数据格式为json
+				async: false,
+				success: function(data) {//请求成功完成后要执行的方法 
+		        	var ii = 0;
+		        	var x_val=0;
+		        	var y_val=0;
+		        	var yaw_val=0;
+		        	var arr;
+		    		var pre_x=0;
+		        	var pre_y=0;
+		        	$.each(data.Results, function (i, Result) {
+		    			setTimeout(function(){
+			    			if(Result.val!="head"){
+				    			led_points_arr[ii]=Result.val;
+				    			++ii;
+				    			arr=Result.val.split("$");
+				    			x_val=arr[0];y_val=arr[1];
+				    			yaw_val=Math.round(Number(arr[2])/100);
+				    			var map_x=Math.round((led_x_offset+Number(x_val))/led_scale);
+					  			var map_y=Math.round((led_y_offset+Number(y_val))/led_scale);
+					  			//draw_now_status(map_x,map_y,'#ff0000',0-yaw_val);//画轮廓
+					  			context2.lineWidth=3;
+								context2.strokeStyle="#ff8000";
+				            	context2.beginPath();
+				    			if(ii==1)
+				            	{
+				            		pre_x=Number(map_x);
+									pre_y=Number(map_y);
+				            	}
+				            	else
+				            	{
+				            		context2.moveTo(pre_x,pre_y);
+				            		context2.lineTo(Number(map_x),Number(map_y));
+				            		pre_x=Number(map_x);
+									pre_y=Number(map_y);
+									//console.log(pre_x+"+"+pre_y);
+				            	}
+								context2.stroke(); 
+				           		context2.closePath();
+				  			}
+			  			},5*i);
+		            });
+				}
+			});	
+	  	}
+		
+		function zoom_unit(){
+			context2.clearRect(0,0,canvas2.width,canvas2.height);
+			var x_val=0;
+			var y_val=0;
+			var arr;
+			var zoom_count=0;
+			var pre_x=0;
+			var pre_y=0;
+			for(;zoom_count<led_points_arr.length;++zoom_count){
+				arr=led_points_arr[zoom_count].split("$");
+				x_val=arr[0];y_val=arr[1];
+				yaw_val=Math.round(Number(arr[2])/100);
+				
+				var map_x=Math.round((led_x_offset+Number(x_val))/led_scale);
+	  			var map_y=Math.round((led_y_offset+Number(y_val))/led_scale);
+	  			context2.lineWidth=3;
+				context2.strokeStyle="#8600FF";
+            	context2.beginPath();
+    			if(zoom_count==0)
+            	{
+            		pre_x=Number(map_x);
+					pre_y=Number(map_y);
+            	}
+            	else
+            	{
+            		context2.moveTo(pre_x,pre_y);
+            		context2.lineTo(Number(map_x),Number(map_y));
+            		pre_x=Number(map_x);
+					pre_y=Number(map_y);
+					//console.log(pre_x+"+"+pre_y);
+            	}
+				context2.stroke(); 
+           		context2.closePath();
+		    }
+		    
+		}
+		
+		
+		function disableRefresh(evt){
+			evt = (evt) ? evt : window.event;
+			evt.stopPropagation();
+			evt.preventDefault();
+			if (evt.keyCode) {
+				
+				
+				if(evt.keyCode == 37&&evt.ctrlKey){			//地图左移  
+					//37 left			
+					zoom_direction(1);
+				}
+				if(evt.keyCode == 38&&evt.ctrlKey){			//地图上移
+					//38 up  			
+					zoom_direction(2);
+				}
+				if(evt.keyCode == 39&&evt.ctrlKey){			//地图右移
+					//39 right			
+					zoom_direction(4);
+				}
+				if(evt.keyCode == 40&&evt.ctrlKey){			//地图下移
+					//40 down			
+					zoom_direction(3);
+				}
+
+				if(evt.keyCode == 107&&evt.ctrlKey){		//放大地图
+					//107+				
+					//zoom_bigger();
+				}
+				if(evt.keyCode == 109&&evt.ctrlKey){		//缩小地图
+					//109-				
+					//zoom_smaller();
+				}
+				
+			}
+		}
+		
+		function zoom_direction(direction){
+			//left
+			if(direction==1){
+				led_x_offset-=1;
+		  		zoom_unit();
+			}
+			//up
+			if(direction==2){
+				led_y_offset-=1;
+		  		zoom_unit(); 
+			}
+			//down
+			if(direction==3){
+				led_y_offset+=1; 
+		  		zoom_unit(); 
+			}
+			//right
+			if(direction==4){
+				led_x_offset+=1;
+		  		zoom_unit();
+			}
+			
+			
+		}
+		
+		
+		</script>
+	</head>
+	
+    <body style="overflow-y:hidden;">
+        <div id="content" class="white">
+            <div class="bloc" >
+                <div class="title">
+                	<p>
+                    	<font color="green"style="position: relative;left: 500px;">
+  	                    	旋转角度：
+                    	</font>
+                    		
+                    	<input id="angle" type="text" class="input"  value="60" style="position: relative;left: 500px;width: 60px;height:28px;    border: 1px solid #DDDCDC;box-shadow: inset 2px 1px 5px #CBC9C9;padding: 0 5px;">		                  
+							
+						<button type="button" class="button black1"style="position: relative;left: -1140px;top:2px;width:80px;float: right;" onclick="showdata1()">查看1</button>
+	                    
+                    </p>
+                    
+                </div>                 
+                <div class="content" style="/*overflow-x: scroll;*/height:840px;">
+                    <div class="input">
+                    	
+                    					<!--xy轨迹（时间）图-->
+                    	<div style="position: relative;top: -10px;left: 20px;font-size: small;font-weight: 900;">
+                    	                 	
+                    	</div>
+                    	<div style="top: 70px;z-index: 100;position: absolute;">
+                        	<canvas id="canvas1"  style="width:1600px;height:800px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        <div style="top: 70px;z-index: 90;position: absolute;">
+                        	<canvas id="canvas2"  style="width:1600px;height:800px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+	                    
+	                    
+	                </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    	  
+	  <style type="text/css">
+		  .inputtext{
+		  	background-color: #FFF;
+		  	border: 1px solid #CDCDCD;
+		  	height: 25px;
+		  	width: 70%;
+		  	text-align:left;
+		  }	
+		  #content {
+          margin: 10px;
+          color: #6D6D6D;
+          padding: 0px 0px 20px;
+          font-size: 12px;
+      }
+      #content h1 {
+          padding-top: 6px;
+          font-family: HattoriHanzoLight;
+          color: #000;
+          text-shadow: 0px 1px 0px #EDEDED;
+          font-size: 27px;
+          font-weight: normal;
+          height: 32px;
+          padding:10px 0 5px 0;
+          letter-spacing: 1px;
+     }
+     #content h1 img {
+        vertical-align: top;
+     }
+		  
+		 #content .left, #content .right {
+        float: left;
+     }
+		  
+		 #content .bloc {
+        margin: 0px;
+        background-color: #FFF;
+        overflow: hidden;
+        box-shadow: 0px 5px 10px #AFAEAE;
+        color: #6D6D6D;
+     }
+     #content.white .bloc .title {
+        background: url('/images/content/white-title.png') repeat scroll 0% 0% transparent;
+        color: #2C2C2C;
+        text-shadow: 0px 1px #FFF;
+        font-weight: bold;
+        border: medium none;
+        height: 35px;
+        position: relative;
+        line-height: 34px;
+        padding: 0px 10px;
+        font-size: 15px;
+     }
+     #content .bloc .content {
+        padding: 10px;
+        background-color: #F7F7F7;
+     }
+    .cb, .clear {
+        clear: both;
+    }
+    #content .submit input, #content .button {
+        background: url('/images/content/buttons.png') repeat scroll left -68px transparent;
+        border: 1px solid #3580A9;
+        text-shadow: 0px -1px 0px #2C6AA3;
+        color: #D4E6EF;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0px 1px 5px #B2B2B2;
+    }
+    tr td {
+       height: 20px;
+       vertical-align: middle;
+      
+       font-size:14px;
+    }
+	  </style>	  
+	  
+</html>

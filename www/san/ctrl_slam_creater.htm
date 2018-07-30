@@ -1,0 +1,917 @@
+﻿<html>
+	<head>
+		<TITLE>hello</TITLE>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<script type="text/javascript" src="/js/jquery1.6.min.js"></script>
+	<script type="text/javascript" src="/jsLib/jqueryui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/jsLib/jqueryui/jqueryui.css" />
+	<script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	
+	<script type="text/javascript" src="/js/bctech_checkbox.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/bctech_checkbox.css">
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/js/waiteffect.js"></script>
+	<script type="text/javascript" src="/js/pubvalidate.js"></script>
+	<style>
+   		.point_item{
+			height:18px;
+			line-height:18px;
+		}
+		.point_item img{
+			display:none;
+			cursor: pointer;
+			width:12px;
+			height:12px;
+		}
+    </style>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			get_creater_battery();
+			window.document.onkeydown = disableRefresh;
+	  		$('.range').each(function() {
+				var cls = $(this).attr('class');
+				var matches = cls.split(/([a-zA-Z]+)\-([0-9]+)/g);
+				var options = {
+					animate: true
+				};
+				var elem = $(this).parent();
+				elem.append('<div class="uirange"></div>');
+				for (i in matches) {
+					i = i * 1;
+					if (matches[i] == 'max') {
+						options.max = matches[i + 1] * 1
+					}
+					if (matches[i] == 'min') {
+						options.min = matches[i + 1] * 1
+					}
+				}
+				options.slide = function(event, ui) {
+					elem.find('span:first').empty().append(ui.value);
+					elem.find('input:first').val(ui.value);
+				}
+				elem.find('span:first').empty().append(elem.find('input:first').val());
+				options.range = 'min';
+				options.value = elem.find('input:first').val() == '' ? 0 : elem.find('input:first').val();
+				elem.find('.uirange').slider(options);
+				$(this).hide();
+			});
+			$('.range5').each(function() {
+				var cls = $(this).attr('class');
+				var matches = cls.split(/([a-zA-Z]+)\-([0-9]+)/g);
+				var options = {
+					animate: true
+				};
+				var elem = $(this).parent();
+				elem.append('<div class="uirange"></div>');
+				for (i in matches) {
+					i = i * 1;
+					if (matches[i] == 'max') {
+						options.max = matches[i + 1] * 1
+					}
+					if (matches[i] == 'min') {
+						options.min = matches[i + 1] * 1
+					}
+				}
+				options.slide = function(event, ui) {
+					elem.find('span:first').empty().append(parseInt(ui.value/10)*10);
+					elem.find('input:first').val(parseInt(ui.value/10)*10);
+				}
+				elem.find('span:first').empty().append(elem.find('input:first').val());
+				options.range = 'min';
+				options.value = elem.find('input:first').val() == '' ? 0 : elem.find('input:first').val();
+				elem.find('.uirange').slider(options);
+				$(this).hide();
+			});
+	  	});
+	  	function get_creater_battery()
+	  	{
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'get_creater_battery',
+	                'a':1
+	            },
+	            success: function (data){
+	            	$("#battery_charge").children().html(data.battery_charge);
+                    $("#battery_capacity").children().html(data.battery_capacity);
+	            },
+	            error:function(){
+	            	
+	            }
+	        });
+	  	}
+	  	function ctrl_creater_fang()
+	  	{
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'ctrl_creater_fang',
+	                'line_t':$("#line_t").val(),
+	                'angle_t':$("#angle_t").val(),
+	                'a':1
+	            },
+	            success: function (data){
+	            	
+	            },
+	            error:function(){
+	            	
+	            }
+	        });	
+	  	}
+	  	
+	  	
+	  	
+	  	function get_user_sensor()
+	  	{
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'get_user_sensor',
+	                'packet':$("#packet").val(),
+	                'bytes':$("#bytes").val(),
+	                'a':1
+	            },
+	            success: function (data){
+	            	$("#packet_val").val(data.packet_val);
+	            },
+	            error:function(){
+	            	
+	            }
+	        });	
+	  	}
+	  	function get_sensor_packets()
+	  	{
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'get_sensor_packets',
+	                'a':1
+	            },
+	            success: function (data){
+	            	$("#drop_bump").val(data.drop_bump);
+	            	$("#is_wall").val(data.is_wall);
+	            	$("#wall_val").val(data.wall_val);
+	            	$("#bump_left").val(data.bump_left);
+	            	$("#bump_front_left").val(data.bump_front_left);
+	            	$("#bump_center_left").val(data.bump_center_left);
+	            	$("#bump_center_right").val(data.bump_center_right);
+	            	$("#bump_front_right").val(data.bump_front_right);
+	            	$("#bump_right").val(data.bump_right);
+	            	$("#cliff_left").val(data.cliff_left);
+	            	$("#cliff_front_left").val(data.cliff_front_left);
+	            	$("#cliff_front_right").val(data.cliff_front_right);
+	            	$("#cliff_right").val(data.cliff_right);
+	            },
+	            error:function(){
+	            	
+	            }
+	        });	
+	  	}
+	  	
+	  	function go_gong()
+	  	{
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'go_gong',
+	                'line_gong':$("#line_gong").val(),
+	                'angle_gong':$("#angle_gong").val(),
+	                'a':1
+	            },
+	            success: function (data){
+	            	
+	            },
+	            error:function(){
+	            	
+	            }
+	        });	
+	  	}
+	  	function stop_gong(){
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'stop_gong',
+	                'a':1
+	            },
+	            success: function (data){
+                    
+	            },
+	            error:function(){
+	            	
+	            }
+	        }); 
+	  	}
+	  	function disableRefresh(evt){
+			evt = (evt) ? evt : window.event;
+			if (evt.keyCode) {
+			   if(evt.keyCode == 37){
+			     //left
+			     ctrl_creater(3);
+			   }
+			   if(evt.keyCode == 38){
+			     //up
+			     ctrl_creater(1);
+			   }
+			   if(evt.keyCode == 39){
+			     //right
+			     ctrl_creater(4);
+			   }
+			   if(evt.keyCode == 40){
+			     //down
+			     ctrl_creater(2);
+			   }
+			   if(evt.keyCode == 32){
+			     //space
+			     ctrl_creater(0);
+			   }
+			   if(evt.keyCode == 81)ctrl_creater_direct(50,55,3);//q
+			   if(evt.keyCode == 87)ctrl_creater_direct(50,60,3);//w
+			   if(evt.keyCode == 69)ctrl_creater_direct(50,50,3);//e
+			   if(evt.keyCode == 82)ctrl_creater_direct(60,60,3);//r
+			   
+			   if(evt.keyCode == 84)ctrl_creater_direct(70,70,3);//t
+			   if(evt.keyCode == 89)ctrl_creater_direct(80,80,3);//y
+			   if(evt.keyCode == 85)ctrl_creater_direct(90,90,3);//u
+			   
+			   if(evt.keyCode == 65)ctrl_creater_direct(100,100,3);//a
+			   if(evt.keyCode == 83)ctrl_creater_direct(-60,-60,3);//s
+			   
+			   if(evt.keyCode == 68)ctrl_creater_direct(100,-100,3);//d
+			   if(evt.keyCode == 70)ctrl_creater_direct(100,-200,3);//f
+			   if(evt.keyCode == 71)ctrl_creater_direct(100,-300,3);//g
+			   if(evt.keyCode == 72)ctrl_creater_direct(100,-400,3);//h
+			   if(evt.keyCode == 74)ctrl_creater_direct(100,-500,3);//j 
+			   
+			   
+			   
+			}
+		}
+		function ctrl_creater_direct(line_val_dir,ang_val_dir,model)
+		{
+			$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'ctrl_creater_direct',
+	                'line_val':line_val_dir,
+	                'ang_val':ang_val_dir,
+	                'model':model,
+	                'a':1
+	            },
+	            success: function (data){
+                    
+	            },
+	            error:function(){
+	            	
+	            }
+	        }); 
+		}
+	  	function ctrl_creater(val){
+	  		var line_val;
+	  		var ang_val;
+	  		//前
+	  		if(val == 1)
+	  		{
+				ang_val=0;
+				line_val=$("#line_val").val();
+	  		}
+	  		//后
+	  		if(val == 2)
+	  		{
+	  			ang_val=0;
+				line_val=0-$("#line_val").val();
+	  		}
+	  		//左
+	  		if(val == 3)
+	  		{
+	  			line_val=0;
+	  			ang_val=$("#ang_val").val();
+	  		}
+	  		//右
+	  		if(val == 4)
+	  		{
+				line_val=0;
+	  			ang_val=0-$("#ang_val").val();
+	  		}
+	  		//停
+	  		if(val == 0)
+	  		{
+				line_val=0;
+	  			ang_val=0;
+	  		}
+	  		
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'ctrl_creater',
+	                'line_val':line_val,
+	                'ang_val':ang_val,
+	                'a':1
+	            },
+	            success: function (data){
+                    
+	            },
+	            error:function(){
+	            	
+	            }
+	        }); 
+	       
+	  	}
+	  	function run_slam(){
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'run_slam',
+	                'a':1
+	            },
+	            success: function (data){
+                    
+	            },
+	            error:function(){
+	            	
+	            }
+	        });
+	  	}
+	  	function stop_slam(){
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'stop_slam',
+	                'a':1
+	            },
+	            success: function (data){
+                    
+	            },
+	            error:function(){
+	            	
+	            }
+	        }); 
+	  	}
+	  	
+	  	function add_point()
+		{
+			var order=new Array("O","A","B","C","D","E","F","G","H","I","J","K","L","M","N","P","Q","R","S","T","U","V","W","X");
+			var tab = $("#point_container dt span").length;
+			var a = "第"+(Number(tab)+1)+"个点"+order[tab];
+			var b = "("+$("#world_x").val()+","+$("#world_y").val()+")";
+			draw_point(a,b);
+			$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'add_point',
+	                'world_x':$("#world_x").val(),
+	                'world_y':$("#world_y").val(),
+	                'tip':Number(tab)+1,
+	                'a':1
+	            },
+	            success: function (data){
+                    
+	            },
+	            error:function(){
+	            	
+	            }
+	        });
+		}
+	  	function draw_point(a,b)
+		{
+			if($('#point_container dt span').length<=24)
+			{
+				$("#point_container").append("<dt class='point_item' onmouseover='$(this).children(\"img\").show();' onmouseout='$(this).children(\"img\").hide();' ><span>" + a + "&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;" + b + "</span> <img src='/images/delete.png' onclick='$(this).parent().remove();' /></dt>");
+			}
+			else
+			{
+				$.messager.alert('系统提示','点的数量不能超过24个！');
+			}
+		}
+	  	function run_peter(val){
+	  		$.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'run_motion',
+	                'motion':val,
+	                'a':1
+	            },
+	            success: function (data){
+                    
+	            },
+	            error:function(){
+	            	
+	            }
+	        }); 
+	  	}
+		</script>
+	</head>
+	
+    <body>
+        <div id="content" class="white">
+            <h1 style="margin:0px 0px 0px 10px;"><img src="/icons/bookmarks-2.png" alt="" />&nbsp;&nbsp;&nbsp;SLAM误差分析creater</h1>
+            <div class="bloc">
+                <div class="title">
+                	<p>
+                    	<font color="red">
+  	                    	提示：
+                    	</font>
+                    </p>
+                     
+                </div>                 
+                <div class="content" style="/*overflow-x: scroll;*/">
+                    
+                    	<table class="input">	
+                    		<tr>
+								<td style="padding-left:10px">启动VSLAM主程序</td>
+								
+								<td>
+									<button type="button" class="button black1"style="position: relative;width:80px;" onclick="run_slam()">开始</button>
+                   				</td>
+								
+                   				<td>
+                   					<button type="button" class="button black1"style="position: relative;width:80px;float: right;" onclick="stop_slam()">结束</button>
+                   				</td>
+								<td colspan=5>
+								</td>
+							</tr>
+							<tr>
+								<td style="padding-left:10px">指定信号采集</td>
+									
+								<td>
+									<button type="button" class="button black1"style="position: relative;width:80px;" onclick="get_user_sensor()">查看</button>
+                   				</td>
+								
+								<td >
+                   					packet
+								</td>
+								<td  >
+									<input id="packet" type="text" class="input" style="left: -80px;position: relative;width: 100px;height:28px" value="25" >
+								</td>
+								<td >
+                   					value
+								</td>
+								<td  >
+									<input id="packet_val" type="text" class="input" style="left: -80px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								
+								<td >
+                   					bytes
+								</td>
+								<td  >
+									<input id="bytes" type="text" class="input" style="float:right;left: -20px;position: relative;width: 100px;height:28px" value="2" >
+								</td>
+								
+								
+                   				
+								<td colspan=4>
+								</td>
+							</tr>
+							<tr>
+								<td style="padding-left:10px">信号采集</td>
+									
+								<td>
+									<button type="button" class="button black1"style="position: relative;width:80px;" onclick="get_sensor_packets()">查看</button>
+                   				</td>
+								
+								<td >
+                   					碰撞
+								</td>
+								<td  >
+									<input id="drop_bump" type="text" class="input" style="left: -80px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								<td >
+                   					有无墙
+								</td>
+								<td  >
+									<input id="is_wall" type="text" class="input" style="left: -80px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								
+								<td >
+                   					墙信号数值
+								</td>
+								<td  >
+									<input id="wall_val" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								
+                   				
+								<td colspan=4>
+								</td>
+							</tr>
+							
+							
+							<tr>
+								<td style="padding-left:10px">
+                   				</td>
+								<td style="padding-left: 0px;" >
+									bump_left
+								</td>
+								<td style="padding-left: 0px;" >
+									bump_front_left
+								</td>
+								<td style="padding-left: 0px;">
+                   					bump_center left
+								</td>
+								
+								<td style="padding-left: 0px">
+                   					bump_center right
+								</td>
+								
+								<td style="padding-left: 0px;">
+                   					bump_front_right
+								</td>
+								<td style="padding-left: 0px;">
+                   					bump_right
+								</td>
+								<td  >
+								</td>
+								
+                   				
+								
+							</tr>
+							
+							<tr>
+								<td style="padding-left:10px">
+                   					
+								</td>
+								<td  >
+									<input id="bump_left" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								
+								<td >
+                   					<input id="bump_front_left" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								<td  >
+									<input id="bump_center_left" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								<td  >
+									<input id="bump_center_right" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+
+								
+								<td >
+                   					<input id="bump_front_right" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								<td  >
+									<input id="bump_right" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								
+								<td  >
+								</td>
+								
+                   				
+								
+							</tr>
+							
+							<tr>
+								<td style="padding-left:10px">
+                   				</td>
+                   				<td  >
+								</td>
+								
+                   				<td style="padding-left: 10px;">
+                   					
+								</td>
+								<td style="padding-left: 10px;" >
+									cliff_left
+								</td>
+								<td style="padding-left: 10px;" >
+									cliff_front_left
+								</td>
+								
+								
+								<td style="padding-left: 10px;">
+                   					cliff_front_right
+								</td>
+								<td style="padding-left: 10px;">
+                   					cliff_right
+								</td>
+								
+								
+								<td style="padding-left:10px">
+                   					
+								</td>
+								
+							</tr>
+							
+							<tr>
+								<td style="padding-left:10px">
+                   					
+								</td>
+								<td  >
+								</td>
+								<td  >
+								</td>
+								<td  >
+									<input id="cliff_left" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								
+								<td >
+                   					<input id="cliff_front_left" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								
+
+								
+								<td >
+                   					<input id="cliff_front_right" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								<td  >
+									<input id="cliff_right" type="text" class="input" style="left: 0px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								
+								
+								<td  >
+								</td>
+                   				
+								
+							</tr>
+							
+							<tr>
+								<td style="padding-left:10px">方形</td>
+									
+								<td>
+									<button type="button" class="button black1"style="position: relative;width:80px;" onclick="ctrl_creater_fang()">行走</button>
+                   				</td>
+								
+								<td >
+                   					line_t
+								</td>
+								<td  >
+									<input id="line_t" type="text" class="input" style="left: -80px;position: relative;width: 100px;height:28px" value="8800" >
+								</td>
+								<td >
+                   					angle_t
+								</td>
+								<td  >
+									<input id="angle_t" type="text" class="input" style="left: -80px;position: relative;width: 100px;height:28px" value="3240" >
+								</td>
+								
+                   				
+								<td colspan=4>
+								</td>
+							</tr>
+							<tr>
+								<td style="padding-left:10px">工字形</td>
+									
+								<td>
+									<button  type="button" class="button black1"style="position: relative;width:80px;" onclick="go_gong()">行走</button>
+                   				</td>
+                   				
+                   				<td>
+									<button  type="button" class="button black1"style="position: relative;width:80px;float: right;" onclick="stop_gong()">停止</button>
+                   				</td>
+								<td ></td>
+								<td >
+                   					line_g
+								</td>
+								<td  >
+									<input id="line_gong" type="text" class="input" style="left: -80px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+								<td >
+                   					angle_g
+								</td>
+								
+                   				
+								<td>
+									<input id="angle_gong" type="text" class="input" style="float:right;left: -20px;position: relative;width: 100px;height:28px" value="" >
+								</td>
+							</tr>
+							
+							<tr>
+								<td style="padding-left:10px">电池容量</td>
+								
+								<td>
+									<button type="button" class="button black1"style="position: relative;width:80px;" onclick="get_creater_battery()">查看</button>
+                   				</td>
+								<td >
+								</td>
+								<td >剩余容量	</td>
+                   				<td>
+                   					
+                   					<div id="battery_charge">
+				                    	<font color="red">
+				  	                    	100
+				                    	</font>
+					                </div>        
+                   				</td>
+                   				<td >总容量</td>
+                   				<td>
+                   					<div id="battery_capacity">
+				                    	<font color="red">
+				  	                    	1000
+				                    	</font>
+					                </div>        
+                   				</td>
+								<td >
+								</td>
+							</tr>
+	                    	<tr>
+								<td style="padding-left:10px">直线速度(mm/s)</td>
+								<td colspan=4 style="height:45px">
+									<span style="display: block;height: 20px;"> &nbsp; 6 &nbsp; </span>
+									<input id="line_val" type="text" class="range5 min-10 max-300"  value="170"/>
+								</td>
+								<td>
+								</td>
+								<td>
+									<button type="button" class="button black1"style="position: relative;left: -140px;top:0px;width:80px;float: right;" onclick="ctrl_creater(1)">前</button>
+                   				</td>
+                   				<td>
+								</td>
+								
+							</tr>
+							
+							<tr>
+								<td style="padding-left:10px"></td>
+								<td colspan=4 style="height:45px">
+									
+								</td>
+								<td>
+									<button type="button" class="button black1"style="position: relative;left: -140px;top:0px;width:80px;float: right;" onclick="ctrl_creater(3)">左</button>
+                   				</td>
+                   				<td>
+									<button type="button" class="button black1"style="position: relative;left: -140px;top:0px;width:80px;float: right;" onclick="ctrl_creater(0)">停</button>
+                   				</td>
+                   				<td>
+									<button type="button" class="button black1"style="position: relative;left: -140px;top:0px;width:80px;float: right;" onclick="ctrl_creater(4)">右</button>
+                   				</td>
+								
+							</tr>
+							
+							
+							<tr>
+								<td style="padding-left:10px">角速度(mm/s)</td>
+								<td colspan=4 style="height:45px">
+									<span style="display: block;height: 20px;"> &nbsp; 6 &nbsp; </span>
+									<input id="ang_val" type="text" class="range5 min-10 max-500"  value="60"/>
+								</td>
+								<td>
+								</td>
+								<td>
+									<button type="button" class="button black1"style="position: relative;left: -140px;top:0px;width:80px;float: right;" onclick="ctrl_creater(2)">后</button>
+                   				</td>
+                   				<td>
+								</td>
+								
+							</tr>
+							
+							
+							
+							<tr>
+								<td style="padding-left:10px">物理坐标</td>
+                   				<td>
+                   					X：
+								</td>
+								<td  >
+									<input id="world_x" type="text" class="input" style="left: -80px;position: relative;width: 120px;height:28px" value="" >
+								</td>
+								<td>
+									<div style="left: -80px;position: relative;">
+										Y:
+									</div>
+								</td>
+								<td  >
+									<input id="world_y" type="text" class="input" style="left: -80px;position: relative;width: 120px;height:28px" value="" >
+								</td>
+								
+								<td>
+                   					<button type="button" class="button black1"style="position: relative;left: -140px;top:0px;width:80px;float: right;" onclick="add_point()">添加</button>
+                   				</td>
+								
+								<td colspan=2 >
+	                                <dl id="point_container"style="position: relative;left: -100px;">
+									</dl>
+								</td>
+                   				
+								
+							</tr>
+							<tr>
+								<td style="padding-left:10px">peter函数</td>
+                   				<td>
+                   					 
+								</td>
+								
+								<td>
+                   					<button type="button" class="button black1"style="position: relative;left: -140px;top:0px;width:80px;float: right;" onclick="run_peter(3)">启动</button>
+                   				</td>
+								
+								<td colspan=5 >
+	                                <dl id="point_container"style="position: relative;left: -100px;">
+									</dl>
+								</td>
+                   				
+								
+							</tr>
+							
+							
+						</table>
+                    					<!--xy轨迹（时间）图-->
+                    	
+	                    
+	                    
+	               
+                </div>
+            </div>
+        </div>
+    </body>
+    	  
+	  <style type="text/css">
+		  .inputtext{
+		  	background-color: #FFF;
+		  	border: 1px solid #CDCDCD;
+		  	height: 25px;
+		  	width: 70%;
+		  	text-align:left;
+		  }	
+		  #content {
+          margin: 10px;
+          color: #6D6D6D;
+          padding: 0px 0px 20px;
+          font-size: 12px;
+      }
+      #content h1 {
+          padding-top: 6px;
+          font-family: HattoriHanzoLight;
+          color: #000;
+          text-shadow: 0px 1px 0px #EDEDED;
+          font-size: 27px;
+          font-weight: normal;
+          height: 32px;
+          padding:10px 0 5px 0;
+          letter-spacing: 1px;
+     }
+     #content h1 img {
+        vertical-align: top;
+     }
+		  
+		 #content .left, #content .right {
+        float: left;
+     }
+		  
+		 #content .bloc {
+        margin: 0px;
+        background-color: #FFF;
+        overflow: hidden;
+        box-shadow: 0px 5px 10px #AFAEAE;
+        color: #6D6D6D;
+     }
+     #content.white .bloc .title {
+        background: url('/images/content/white-title.png') repeat scroll 0% 0% transparent;
+        color: #2C2C2C;
+        text-shadow: 0px 1px #FFF;
+        font-weight: bold;
+        border: medium none;
+        height: 35px;
+        position: relative;
+        line-height: 34px;
+        padding: 0px 10px;
+        font-size: 15px;
+     }
+     #content .bloc .content {
+        padding: 10px;
+        background-color: #F7F7F7;
+     }
+    .cb, .clear {
+        clear: both;
+    }
+    #content .submit input, #content .button {
+        background: url('/images/content/buttons.png') repeat scroll left -68px transparent;
+        border: 1px solid #3580A9;
+        text-shadow: 0px -1px 0px #2C6AA3;
+        color: #D4E6EF;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0px 1px 5px #B2B2B2;
+    }
+    tr td {
+       height: 20px;
+       vertical-align: middle;
+      
+       font-size:14px;
+    }
+	  </style>	  
+	  
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html >
+<html>
+<head>
+<!-- 品牌 -->
+<title>SanKoBot - 登录</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0" />
+<link rel="shortcut icon" type="image/x-icon" href="/msa/logo.ico" />
+<script type="text/javascript" src="/msa/js/jquery.min.js"></script>
+<script type="text/javascript" src="/msa/jsLib/layer/layer.min.js"></script>
+<script type="text/javascript" src="/msa/jsLib/easyui/jquery.easyui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/msa/jsLib/easyui/easyui.css">
+	  
+<style>
+	* {
+		margin: 0px;
+		padding: 0px;
+	}
+	
+	input[type="text"],
+	input[type="password"]
+	{
+		height: 30px;
+		line-height: 30px;
+		/*padding-left: 15px;*/
+		text-indent: 15px;
+		font-size: 14px;
+		background: #ffffff;
+		outline: none;
+		border:1px solid #2688BF;
+		border-radius:5px;
+		width:100%;
+	}
+	input[type="button"]
+	{
+		height: 30px;
+		line-height: 30px;
+		font-size: 14px;
+		background: #ffffff;
+		outline: none;
+		border:1px solid #3EA3DD;
+		border-radius:5px;
+		width:100%;
+		background:#1291DA;
+		color:#ddd;
+		cursor:pointer;
+		font-weight:blod;
+	}
+	input[type="button"]:hover
+	{
+		background:#039DF4;
+		color:white;
+	}   		
+	input::-ms-clear,
+	input::-ms-reveal {
+		display: none;
+	}
+	
+	body {
+		background-color: #2672BF;
+	}
+	.top{
+		float: left;
+		margin: 20px 50px;
+		padding: 5px 2px;
+	}
+	
+	#welcome{
+		 color: #DDD;
+		 font-size: 26px;
+		 text-align: center;
+		 font-family: Microsoft YaHei;
+	}
+	
+	@media screen and (max-width: 600px) {
+		#welcome{
+			font-size: 24px;
+		}
+	}
+</style>
+<script type="text/javascript">
+	
+	function IsPC() {
+	    var userAgentInfo = navigator.userAgent;
+	    var Agents = ["Android", "iPhone",
+	                "SymbianOS", "Windows Phone",
+	                "iPad", "iPod"];
+	    var flag="PC";
+	    for (var v = 0; v < Agents.length; v++) {
+	        if(v==4){
+	        	if (userAgentInfo.indexOf(Agents[v]) > 0){
+	        		flag = "iPad";
+	        		break;
+	        	}
+	        }else{
+	        	if (userAgentInfo.indexOf(Agents[v]) > 0) {
+		            flag = "phone";
+		            break;
+		        }
+	        }
+	    }
+	    return flag;
+	}
+	
+	function loginon(){
+		var nameadmin=$("#Username").val();
+		var passadmin=$("#Password").val();
+		
+		if(nameadmin=="" || nameadmin=="管理员帐号"){
+			layer.alert("用户名为空！",0);
+			return;
+		}
+		if(passadmin=="" || passadmin=="管理员密码"){
+			layer.alert("密码为空！",0);
+			return;
+		}
+		
+		if(nameadmin=="admin"&&passadmin=="admin"){//完全正确
+			window.location.href = '/main.htm';
+		}else{
+			layer.alert("登陆失败，用户或密码错误！",0);
+			$("#Password").val("").focus();
+		}
+			
+	}
+	
+	$(document).ready(function() {
+		//$('#Username').focus();
+		if("phone"==IsPC())window.location.href = '/san/grid_map_phone.htm';
+		if("iPad"==IsPC())window.location.href = '/san/grid_map_ipad_vi.htm';
+		if("PC"==IsPC())window.location.href = '/san/grid_map.htm';
+
+		$("#Password").keydown(onKeydown);
+	});
+	
+	function onKeydown(event){
+		var e = event || window.event || arguments.callee.caller.arguments[0];
+		if(e && e.keyCode == 13){
+			loginon();
+		}
+	}
+	
+	function onInputFocus(o, ispassword){
+		var $this = $(o);
+		if($this.val() == $this.attr('defaulttext')){
+			$this.val('');
+			if(ispassword){
+				$this[0].type = 'password';
+			}
+		}
+	}
+	
+	function onInputBlur(o, ispassword){
+		var $this = $(o);
+		if($this.val() == ''){
+			$this.val($this.attr('defaulttext'));
+			if(ispassword){
+				$this[0].type = 'text';
+			}
+		}
+	}
+	
+</script>
+</head>
+<body >
+<div style="overflow:hidden;disabled:none">
+	<div class="top" style="height:88px">
+		
+	</div>
+</div>
+<div>
+<center>
+	<table cellspacing="20" style="width:75%;max-width:400px;">
+		<tr>
+			<td>
+				
+			</td>
+		</tr>
+		<tr>
+			<!-- 品牌 -->
+			<td id='welcome'>
+				SanKoBot
+			</td>
+		</tr>	
+		<tr>
+			<td>
+				<input id="Username" name="Username" type="text" value="admin" style="display:none;color:#AAA" defaulttext="管理员帐号" onfocus="onInputFocus(this, false)" onblur="onInputBlur(this, false)" />
+			</td>
+		</tr>
+		<tr>
+			 <td>
+				<input id="Password" name="password" type="password" value="admin" style="display:none;color:#AAA"  defaulttext="管理员密码" onfocus="onInputFocus(this, true)" onblur="onInputBlur(this, true)" />
+			</td>
+		</tr>
+		<tr>
+			 <td>
+				<input id="Login" type="button" onclick="loginon()" value="登录"style="display:none;"  />
+			</td>
+		</tr>
+	</table>
+	</center>
+</div>
+<div style="margin-top:50px">
+	<!-- 品牌 -->
+	<!--div style="color:#8AB2DC;width:380px;margin:0 auto">
+		<span style="font-size:20px;line-height:30px;vertical-align:bottom">©</span> <span style="font-size:12px;line-height:30px">由游通产品 | 服务热线 400-8892728或者021-51097213</span>
+	</div-->
+</div>
+</body>
+</html>

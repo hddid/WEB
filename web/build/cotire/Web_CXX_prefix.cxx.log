@@ -1,0 +1,22 @@
+Multiple include guards may be useful for:
+/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/include/c++/5.2.0/arm-openwrt-linux-muslgnueabi/bits/ctype_base.h
+/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/include/c++/5.2.0/arm-openwrt-linux-muslgnueabi/bits/ctype_inline.h
+/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/include/c++/5.2.0/arm-openwrt-linux-muslgnueabi/bits/messages_members.h
+/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/include/c++/5.2.0/arm-openwrt-linux-muslgnueabi/bits/time_members.h
+/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/include/c++/5.2.0/clocale
+/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/include/c++/5.2.0/cstdio
+/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/include/c++/5.2.0/cstdlib
+/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/include/c++/5.2.0/cwctype
+/home/will/pack/staging_dir/toolchain/include/bits/errno.h
+/home/will/pack/staging_dir/toolchain/include/bits/fcntl.h
+/home/will/pack/staging_dir/toolchain/include/bits/ioctl.h
+/home/will/pack/staging_dir/toolchain/include/bits/ipc.h
+/home/will/pack/staging_dir/toolchain/include/bits/posix.h
+/home/will/pack/staging_dir/toolchain/include/bits/sem.h
+/home/will/pack/staging_dir/toolchain/include/bits/shm.h
+/home/will/pack/staging_dir/toolchain/include/bits/socket.h
+/home/will/pack/staging_dir/toolchain/include/bits/stat.h
+/home/will/pack/staging_dir/toolchain/include/bits/stdint.h
+/home/will/web/web/Src/direction.cc
+/home/will/web/web/Src/share_memory_api.cc
+/home/will/web/web/Src/web.cc

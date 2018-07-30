@@ -1,0 +1,11 @@
+.bctech_checkbox{
+	background: url(/msa/images/content/checkbox.png) no-repeat bottom left;
+	height: 24px;
+	padding-left:52px;
+	line-height: 24px;
+	display: inline-block;
+	cursor: pointer;
+}
+.bctech_checkbox.checked{
+	background-position:top left;
+}

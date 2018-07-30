@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>SanKoBot</title>
+	<link rel="icon" href="/msa/logo.ico" type="image/x-icon" />
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<script type="text/javascript" src="/msa/js/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="/msa/jsLib/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/msa/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+	<link rel="stylesheet" type="text/css" href="/msa/jsLib/easyui/easyui.css">
+	<link rel="stylesheet" type="text/css" href="/msa/jsLib/easyui/icon.css">
+
+	<link rel="stylesheet" type="text/css" href="/msa/jsLib/sidebar/sidebar.css">
+	<script type="text/javascript" src="/msa/jsLib/sidebar/sidebar.js"></script>
+
+	<script type="text/javascript" src="/msa/js/bctech_checkbox.js"></script>
+	<link rel="stylesheet" type="text/css" href="/msa/css/bctech_checkbox.css">
+
+	<script type="text/javascript" src="/msa/js/pubutil.js"></script>
+
+	<script type="text/javascript" src="/msa/js/ping.js"></script>
+
+	<script>
+	</script>
+
+	<style>
+		#head,
+		#head a.button {
+			background: url(/msa/images/spriteh.png);
+		}
+		
+		#head {
+			height: 40px;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			line-height: 40px;
+			border: 1px solid #000;
+			color: #AEAEAE;
+			-moz-text-shadow: 0px 1px 0px #000;
+			-webkit-text-shadow: 0px 1px 0px #000;
+			-o-text-shadow: 0px 1px 0px #000;
+			text-shadow: 0px 1px 0px #000;
+			z-index: 9999
+		}
+		
+		#head .left {
+			position: absolute;
+			left: 15px;
+			top: 0
+		}
+		
+		#head .right {
+			position: absolute;
+			top: 0;
+			right: 15px
+		}
+		
+		#head a {
+			color: #FFF;
+			text-decoration: none
+		}
+		
+		#head a:hover {
+			text-decoration: underline
+		}
+		
+		#head .button {
+			border: 1px solid #222;
+			-moz-border-radius: 5px;
+			-webkit-border-radius: 5px;
+			-khtml-border-radius: 5px;
+			border-radius: 5px 5px 5px 5px;
+			display: inline-block;
+			height: 25px;
+			line-height: 25px;
+			margin-top: 6px;
+			text-align: center;
+			padding: 0 10px;
+			cursor: pointer;
+		}
+		
+		#head .button:not(.profile):hover {
+			background-color: #2a2a2a;
+		}
+		
+		#head .button.profile {
+			cursor: default;
+		}
+		
+		.gwmodeshow , showedition0, .showedition1, .showedition2{
+			display: none;
+		}
+	</style>
+</head>
+
+<body class="easyui-layout">
+	<div data-options="region:'north'" style="height:40px;width:100%;">
+		<div id="head">
+			<div style="width:39% ;float:left;">
+				<span class="button profile" style="margin-left:20px;"><img src="/msa/icons/huser.png" alt="" style="vertical-align: top;margin-top:5px;" /></span> 您好,欢迎登录SanKoBot测试系统!
+			</div>
+			<div class="right">
+				<span id="logout" class="button">注销</span>
+			</div>
+		</div>
+	</div>
+	<div data-options="region:'center',iconCls:'icon-ok'" style="background: url('/msa/images/bg.png') repeat scroll 0% 0% transparent;">
+		<iframe id="mianfrm" name="mainfrm" src="" width="100%" height="99%" style="border:none;"></iframe>
+	</div>
+	<div data-options="region:'west',split:false" style="width:180px;">
+		<div id="sidebar">
+			<ul>
+				<li class="current">
+					<a href="#" onclick="IframeSrc('/msa/main.xp?Fun=msaShowNowSatatus', '')"><img src="/msa/icons/menu/layout.png" alt="" />扫地机状态 </a>
+				</li>
+				<li style="">
+					<a href="#" onclick="IframeSrc('/msa/main.xp?Fun=msaSysModePage', '')"><img src="/msa/icons/menu/setting.png" alt="" />修改密码 </a>
+				</li>
+				<li class='professionaledition'>
+					<a href="#"><img src="/msa/icons/menu/brush.png" alt="" />SLAM</a>
+					<ul>
+						<li><a href="#" onclick="IframeSrc('/san/ctrl_slam_xrobot.htm','')">xrobot误差分析</a></li>
+						<li><a href="#" onclick="IframeSrc('/san/ctrl_slam_creater.htm','')">creater误差分析</a></li>
+						<li><a href="#" onclick="IframeSrc('/san/err_count.htm','')">误差计算</a></li>
+						<li><a href="#" onclick="IframeSrc('/san/slam_path.htm','')">轨迹图 </a></li>
+						<li><a href="#" onclick="IframeSrc('/san/empty.htm','')">云图 </a></li>
+						<li><a href="#" onclick="IframeSrc('/san/grid_map.htm','')">栅格图</a></li>
+						<li><a href="#" onclick="IframeSrc('/san/snake_map.htm','')">区域图</a></li>
+					</ul>
+				</li>
+				
+				<li>
+					<a href="#"><img src="/msa/icons/menu/brush.png" alt="" />IMU</a>
+					<ul>
+						<li><a href="#" onclick="IframeSrc('/san/shui_rotate.htm','')">旋转测试 </a></li>
+						<li><a href="#" onclick="IframeSrc('/san/empty.htm','')">日志查看</a></li>
+					</ul>
+				</li>
+				
+				<li>
+					<a href="#"><img src="/msa/icons/menu/brush.png" alt="" />光流计</a>
+					<ul>
+						<li><a href="#" onclick="IframeSrc('/san/flow_line.htm')">直线测试</a></li>
+						<li><a href="#" onclick="IframeSrc('/san/flow_time.htm','')">实时显示 </a></li>
+						<li><a href="#" onclick="IframeSrc('/san/flow_demo.htm','')">相对显示 </a></li>
+						<li><a href="#" onclick="IframeSrc('/san/img_show.htm','')">图片显示 </a></li>
+					</ul>
+				</li>
+				
+				
+				
+				<li>
+					<a href="#"><img src="/msa/icons/menu/brush.png" alt="" />里程计</a>
+					<ul>
+						<li><a href="#" onclick="IframeSrc('/san/empty.htm','')">地图 </a></li>
+						<li><a href="#" onclick="IframeSrc('/san/empty.htm','')">统计数据</a></li>
+					</ul>
+				</li>
+				
+				
+			</ul>
+		</div>
+	</div>
+	
+	
+
+</body>
+
+</html>
+
+<script>
+	$(document).ready(function () {
+		
+
+		$("#logout").bind("click", function (e) {
+			logout();
+		});
+
+	});
+	
+
+	function IframeSrc(srcnew) {
+		document.getElementById("mianfrm").src = srcnew;
+	}
+
+	function logout() {
+		$.messager.confirm('提示', '您确定要退出登录?', function (r) {
+			if (r == true) {
+				window.location.href = '/';
+			}
+		});
+
+	}
+
+	
+</script>

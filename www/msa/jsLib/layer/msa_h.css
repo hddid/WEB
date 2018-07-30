@@ -1,0 +1,89 @@
+﻿.bloc {
+    margin: 6px 0px 0px;
+    background-color: #FFF;
+    color: #6D6D6D;
+    box-shadow: 0px 5px 10px #AFAEAE;
+}     
+
+.left{
+	  float:left;
+	  width:49%;
+}
+.right{
+	  float:right;
+	  width:50%;
+}
+
+  
+.bloc .title {
+    background: url('/msa/css/img/white-title-human.png') repeat scroll 0% 0% transparent;
+    color: #2C2C2C;
+    text-shadow: 0px 1px #FFF;
+    font-weight: bold;
+    border: medium none;
+    font-size: 15px;
+    padding: 10px 0px 10px 10px;
+}  
+.bloc .content {
+    padding: 10px;
+    background-color: #F7F7F7;
+    color: #6D6D6D;
+} 
+.mytable {
+	  table-layout:fixed;
+    width: 100%;
+    text-align: left;
+    border-collapse: separate;
+    border-spacing: 0px;
+    color: #2C2C2C;
+    
+}   
+.mytable thead tr th {
+	  text-align: left;
+    font-weight: bold;
+    color: #151515;
+    font-size: 12px;
+    padding-bottom: 2px;
+}
+
+.mytable thead th {
+    border-bottom: 1px solid #BDBDBD;
+} 
+.mytable tbody tr:nth-child(2n+1) td {
+    background-color: #F0F0F0;
+}
+
+.mytable tbody tr td {
+    border-right:0px;
+    border-left:0px;
+    vertical-align:middle;
+    font-size:14px;
+    height:27px;
+    border-bottom: 1px solid #DADADA;
+
+   
+}
+.mytable tbody tr:hover td{
+	 background-color:#EAEAEA;
+	 border-bottom:1px solid #CACACA;
+	 border-top:1px solid #E2E2E2
+}
+
+.actions{
+   text-align:right;
+   padding:0px 20px 0px 0px;
+}
+.button {
+    background: url('/msa/css/img/buttons.png') repeat scroll left -68px transparent;
+    border: 1px solid #3580A9;
+    text-shadow: 0px -1px 0px #2C6AA3;
+    color: #D4E6EF;
+    font-weight: bold;
+    padding: 4px 7px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0px 1px 5px #B2B2B2;
+}
+
+.cb,.clear{clear:both}

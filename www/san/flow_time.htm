@@ -1,0 +1,376 @@
+﻿<html>
+	<head>
+		<TITLE>hello</TITLE>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/jsLib/easyui/icon.css">
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>      
+
+	<script type="text/javascript">
+		var canvas;
+  		var context;
+  		var i =0;
+	  	var line = 0;
+	  	var minx = 0;
+	  	var miny = 0;
+	  	var maxx = 0;
+	  	var maxy = 0;
+	  	var tii=0;
+	  	$(document).ready(function() {
+	  		canvas=document.getElementById("canvas"); 
+			context=canvas.getContext("2d");
+			
+			
+	  	});
+	  	function mycon(a,b)
+	  	{
+	  		console.log(a+"="+b);	
+	  	}
+	  	
+	  	function ting()
+	  	{
+	  		tii = 10010;	
+	  	
+	  	}
+	  	function change_shaft()
+	  	{
+		  	var num = new Array();
+	    	var rate = new Array([0.021],[0.093],[0.166],[0.239],[0.312],[0.381],[0.457],[0.53],[0.603],[0.678],[0.751],[0.824],[0.896],[0.969]);
+	    	var iii=0;
+	    	for(iii=0;iii<14;iii++);
+	    		//num[iii]=Math.round(data.total*rate[iii]);
+	    	
+			for(iii=0;iii<14;iii++)
+			{
+				if(ii == num[iii])
+				{
+					if(0==iii)
+						$("td")[iii+42].innerHTML="X：&nbsp;&nbsp;"+"1";
+					else
+						$("td")[iii+42].innerHTML="2";
+					$("td")[39-iii*3].innerHTML="3";
+				}
+			}
+		}
+	  	//function resize(maxx,minx,maxy,miny)
+	  	
+	  	function resize(w,h,xx,yy)
+		{
+		    var imgData = context.getImageData(0,0,canvas.width,canvas.height);
+		    canvas.width = w;
+		    canvas.height = h;
+		    context.putImageData(imgData,xx,yy);
+		}
+		/*
+		function resize(w,h)
+		{
+		    var nc = document.createElement("canvas");
+		    nc.width = canvas.width;
+		    nc.height = canvas.height;
+		    nc.getContext("2d").drawImage(canvas,0,0);
+		    canvas.width = w;
+		    canvas.height = h;
+		    context.drawImage(nc,0,0);
+		}*/
+		function showdata2()
+	  	{
+	        tii+=1;
+	        if(tii>10000){return;}
+	        setTimeout("showdata()",1000);
+	        
+	  	}
+		
+		
+	  	function showdata(){
+	  		tii+=1;
+	        if(tii>10000){return;}
+	  	    $.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'get_realtime',
+	                'line':line,
+	                'minx':minx,
+	                'miny':miny,
+	                'maxx':maxx,
+	                'maxy':maxy,
+	                'a':1
+	            },
+	            success: function (data){
+	            	var aa = 0;
+					var bb = 0;
+	            	var ii=0;
+	            	if(Number(line) == 0)
+		        	{
+		        		aa = 60-data.minx;
+		        		bb = 60-data.miny;
+		        		resize(data.maxx-data.minx+120, data.maxy-data.miny+120,0,0);
+		        	}
+		        	else
+		        	{
+		        		aa = 60-data.minx;
+		        		bb = 60-data.miny;
+		        		resize(data.maxx-data.minx+120, data.maxy-data.miny+120,minx-data.minx,miny-data.miny);
+		        		mycon("ΔX",minx-data.minx);
+		        		mycon("ΔY",miny+"-"+data.miny);
+		        		mycon("=",miny-data.miny);
+		        		
+		        	}
+		        	mycon("aa",aa);
+		        	mycon("bb",bb);
+		        	mycon("width",data.maxx-data.minx+120);
+		        	mycon("height",data.maxy-data.miny+120);
+		        	minx=data.minx;
+					miny=data.miny;
+					maxx=data.maxx;
+					maxy=data.maxy;
+	
+	            	line = data.line;
+					context.lineWidth=30;
+					context.strokeStyle="#ff8000";
+	            	context.beginPath();
+	            	//alert(data.translate_x+"+"+data.translate_y);	
+	            	$("td")[42].style.paddingLeft="40px";
+	            	$.each(data.Results, function (i, Result) {
+                        ii++;
+                        if(ii == 1)
+                        {
+                        	context.moveTo(Number(Result.xxx)+Number(aa),Number(Result.yyy)+Number(bb));
+						}
+						else
+						{
+							context.lineTo(Number(Result.xxx)+Number(aa),Number(Result.yyy)+Number(bb));
+						}
+						mycon("x",Number(Result.xxx)+Number(aa));
+                        mycon("y",Number(Result.yyy)+Number(bb));
+                    });
+                    context.stroke(); 
+                   	context.closePath();
+	            },
+	            error:function(){
+	            	
+	            }
+	        }); 
+	        setTimeout("showdata()",1000);
+	  	}
+	  	
+  		
+	  	
+	  	
+		</script>
+	</head>
+	
+    <body>
+        <div id="content" class="white">
+            <h1 style="margin:0px 0px 0px 10px;"><img src="/icons/bookmarks-2.png" alt="" />&nbsp;&nbsp;&nbsp;SanKobot测试</h1>
+            <div class="bloc">
+                <div class="title">
+                	<p>
+                    	<font color="red">
+  	                    	实时显示：
+                    	</font>
+                    </p>
+                    <button type="button" class="button black1"style="position: relative;left: -140px;top:-30px;width:80px;float: right;" onclick="showdata()">查看</button>
+                    <button type="button" class="button black1"style="position: relative;left: -140px;top:-30px;width:80px;float: right;" onclick="ting()">暂停</button>
+                    
+                </div>                 
+                <div class="content" style="/*overflow-x: scroll;*/">
+                    <div class="input">
+                    	
+                    					<!--xy轨迹（时间）图-->
+                    	<div style="position: relative;top: -10px;left: 20px;font-size: small;font-weight: 900;">
+                    	    <font color="black">
+  	                    		Y	
+                    		</font>               
+                    		<font color="black" style="float: right;position: relative;left: 60px;">
+  	                    		时间（秒）
+                    		</font>                	
+                    	</div>
+                    	<div style="top: 10px;z-index: 100;position: relative;">
+                        	<canvas id="canvas" width="1024" height="300" style="width:1100px;height:400px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+	                    <table style="position: relative;top: -510px;"> 
+	                    	
+	                    	<tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                        <tr>
+	                        	<td ></td>
+								<td colspan="12" ></td>
+								<td colspan="2"></td>
+	                        </tr>  
+	                    	<tr>
+	                           <td style="padding-left:80px;width: 80px;">1</td>
+	                           <td style="width: 80px;">2 </td>
+	                           <td style="width: 80px;">3 </td>
+	                           <td style="width: 80px;">4 </td>	
+	                           <td style="width: 80px;">5 </td>
+	                           <td style="width: 80px;">6 </td>
+	                           <td style="width: 80px;">7 </td>
+	                           <td style="width: 80px;">8 </td>	
+	                           <td style="width: 80px;">9 </td>
+	                           <td style="width: 80px;">10</td>
+	                           <td style="width: 80px;">11</td>
+	                           <td style="width: 80px;">12</td>	
+	                           <td style="width: 80px;">13</td>
+	                           <td style="width: 80px;">14</td>
+	                           <td></td>
+	                        </tr> 
+	                        
+
+	                        
+	                    </table> 
+	                    
+	                    
+	                </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    	  
+	  <style type="text/css">
+		  .inputtext{
+		  	background-color: #FFF;
+		  	border: 1px solid #CDCDCD;
+		  	height: 25px;
+		  	width: 70%;
+		  	text-align:left;
+		  }	
+		  #content {
+          margin: 10px;
+          color: #6D6D6D;
+          padding: 0px 0px 20px;
+          font-size: 12px;
+      }
+      #content h1 {
+          padding-top: 6px;
+          font-family: HattoriHanzoLight;
+          color: #000;
+          text-shadow: 0px 1px 0px #EDEDED;
+          font-size: 27px;
+          font-weight: normal;
+          height: 32px;
+          padding:10px 0 5px 0;
+          letter-spacing: 1px;
+     }
+     #content h1 img {
+        vertical-align: top;
+     }
+		  
+		 #content .left, #content .right {
+        float: left;
+     }
+		  
+		 #content .bloc {
+        margin: 0px;
+        background-color: #FFF;
+        overflow: hidden;
+        box-shadow: 0px 5px 10px #AFAEAE;
+        color: #6D6D6D;
+     }
+     #content.white .bloc .title {
+        background: url('/images/content/white-title.png') repeat scroll 0% 0% transparent;
+        color: #2C2C2C;
+        text-shadow: 0px 1px #FFF;
+        font-weight: bold;
+        border: medium none;
+        height: 35px;
+        position: relative;
+        line-height: 34px;
+        padding: 0px 10px;
+        font-size: 15px;
+     }
+     #content .bloc .content {
+        padding: 10px;
+        background-color: #F7F7F7;
+     }
+    .cb, .clear {
+        clear: both;
+    }
+    #content .submit input, #content .button {
+        background: url('/images/content/buttons.png') repeat scroll left -68px transparent;
+        border: 1px solid #3580A9;
+        text-shadow: 0px -1px 0px #2C6AA3;
+        color: #D4E6EF;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0px 1px 5px #B2B2B2;
+    }
+    tr td {
+       height: 20px;
+       vertical-align: middle;
+      
+       font-size:14px;
+    }
+	  </style>	  
+	  
+</html>

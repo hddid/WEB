@@ -1,0 +1,160 @@
+﻿<html>
+	<head>
+		<TITLE>hello</TITLE>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/jsLib/easyui/icon.css">
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>      
+
+	<script type="text/javascript">
+		
+	  	function showdata(){
+	  		
+	  	    $.ajax({
+	            type: "POST",
+	            url: "/sankobot/main.xp",
+	            dataType:'json',
+	            data:{
+	                'Fun':'get_img',
+	                'a':1
+	            },
+	            success: function (data){
+	            	
+	            	$.each(data.Results, function (i, Result) {
+                        ii++;
+                        if(ii == 1)
+                        {
+                        	context.moveTo(Number(Result.xxx)+Number(aa),Number(Result.yyy)+Number(bb));
+						}
+						else
+						{
+							context.lineTo(Number(Result.xxx)+Number(aa),Number(Result.yyy)+Number(bb));
+						}
+						mycon("x",Number(Result.xxx)+Number(aa));
+                        mycon("y",Number(Result.yyy)+Number(bb));
+                    });
+                    
+	            },
+	            error:function(){
+	            	
+	            }
+	        }); 
+	       
+	  	}
+	  	
+  		
+	  	
+	  	
+		</script>
+	</head>
+	
+    <body>
+        <div id="content" class="white">
+            <h1 style="margin:0px 0px 0px 10px;"><img src="/icons/bookmarks-2.png" alt="" />&nbsp;&nbsp;&nbsp;SanKobot测试</h1>
+            <div class="bloc">
+                <div class="title">
+                	<p>
+                    	<font color="red">
+  	                    	图片显示：
+                    	</font>
+                    </p>
+                    <button type="button" class="button black1"style="position: relative;left: -140px;top:-30px;width:80px;float: right;" onclick="showdata()">查看</button>
+                    
+                </div>                 
+                <div class="content" style="/*overflow-x: scroll;*/">
+                    <div class="input">
+                    	
+                    					<!--xy轨迹（时间）图-->
+                    	<img src="data:text/plain,00 00 00 00 00 00 00 00 00 00 08 0C 18 38 34 40 40 4C 70 5C 6C 34 4C 3C 24 1C 04 00 00 00 00 00 00 00 00 00 00 0C 10 20 3C 60 5C 8C 60 58 60 78 84 74 78 80 84 8C 60 50 40 2C 18 04 00 00 00 00 00 08 10 28 34 50 74 78 60 6C 64 54 54 6C 88 70 78 8C 88 60 74 50 74 78 34 1C 00 00 00 00 04 18 2C 6C 7C 7C 78 70 68 80 6C 70 74 AC 88 74 78 6C 70 6C 90 5C 4C 7C 6C 6C 00 00 00 10 18 44 5C 7C 70 74 8C 54 64 70 8C 70 94 B8 64 68 90 98 94 54 74 88 54 78 94 78 00 00 0C 30 50 60 60 74 7C 80 98 74 78 7C 90 74 74 80 8C A4 70 54 A8 74 90 74 70 8C 98 60 00 08 1C 4C 80 60 54 6C 7C 74 70 64 9C 74 8C 74 7C 64 98 B4 A0 78 A4 70 94 7C 90 74 7C 5C 0C 1C 3C 54 70 80 60 74 7C 8C 88 6C 78 90 C0 A0 88 80 9C 9C 88 64 70 A8 74 78 64 54 7C 64 18 34 50 40 7C 84 60 78 58 84 94 64 5C C4 7C 64 78 78 80 C0 6C 84 6C 90 88 94 7C 60 70 50 20 3C 68 50 70 88 68 74 50 90 54 68 6C 64 6C 60 7C 6C 74 C0 78 60 50 88 8C 78 64 64 5C 88 40 5C 5C 68 6C 5C 70 78 64 60 80 70 98 7C A0 6C 74 58 90 84 6C 60 74 60 64 7C 58 9C 7C 74 40 54 8C 5C 60 54 64 74 A0 7C 78 78 B0 A0 78 78 64 74 78 70 78 84 80 74 9C 80 48 84 74 58 7C 7C 8C 68 68 78 78 94 84 68 78 94 98 A4 98 74 68 74 68 6C 6C 9C 60 70 64 70 64 5C 68 50 5C 4C 64 6C 58 6C 78 7C 78 84 60 A0 8C 9C 7C 70 74 84 88 84 68 8C 54 6C 70 78 5C 90 60 58 88 54 4C 5C 74 68 78 74 7C 80 64 A4 6C 58 74 78 70 80 8C 70 88 7C 50 6C 50 64 68 64 70 64 78 54 74 54 74 6C 5C 80 84 54 84 64 98 60 54 70 68 90 78 54 A8 48 68 48 50 68 5C 60 7C 64 58 5C 64 74 7C 60 64 68 88 74 94 70 9C 7C 98 64 74 80 84 7C 94 68 74 50 60 8C 7C 68 A4 58 4C 74 48 60 80 6C 5C 60 68 50 8C 84 80 68 68 98 D0 64 6C 78 88 64 64 64 58 78 78 80 64 70 44 58 4C 7C 74 AC 54 64 78 74 94 78 98 BC 80 88 7C 70 88 68 64 A0 6C 5C 74 9C 68 64 84 80 68 50 7C 64 50 5C 60 74 68 64 70 88 88 A8 8C 70 68 7C A8 68 7C AC 6C 68 50 78 9C 64 64 60 4C 50 74 7C 6C 5C 80 5C 6C 80 60 78 90 9C 9C A4 78 74 68 9C 88 94 60 50 88 84 70 68 44 60 88 50 7C 8C 80 64 78 60 84 90 84 78 70 7C 74 68 6C 74 74 A4 84 70 4C 5C 74 68 5C 54 5C 44 80 88 84 80 64 68 78 6C 60 98 A8 80 78 80 8C 50 70 68 78 6C 70 60 74 78 7C 70 50 70 48 48 74 6C 68 84 90 70 8C 78 7C 80 80 8C 7C 84 8C 64 7C 80 70 70 80 88 80 A4 60 68 64 50 64 58 48 80 5C 6C 70 54 78 74 70 80 A0 64 58 74 80 78 70 78 74 64 70 84 98 80 54 70 50 4C 9C 74 50 8C 78 6C 58 78 80 70 80 5C 84 68 6C 70 A0 90 6C 78 80 7C 6C 74 9C 6C 60 68 64 84 88 7C 44 70 C0 78 5C 60 84 70 60 4C 7C 74 88 9C 7C 7C 7C 84 68 58 64 6C 74 7C 54 64 6C 78 60 6C 5C 50 4C 60 44 6C 64 94 4C 68 70 60 90 A0 A0 8C 74 80 6C 58 90 5C 7C 74 64 54 5C 94 94 68 60 80 84 80 6C 88 64 68 5C 68 7C 78 74 B8 98 5C 94 94 68 88 7C 54 7C 74 5C 4C 74 6C 70 58 54 70 4C 84 68 7C 58 54 84 90 74 78 90 78 7C 64 70 98 78 80 78 78 5C 50 7C 64 A0 74 64 24 "/>
+　　
+	                    
+	                    
+	                </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    	  
+	  <style type="text/css">
+		  .inputtext{
+		  	background-color: #FFF;
+		  	border: 1px solid #CDCDCD;
+		  	height: 25px;
+		  	width: 70%;
+		  	text-align:left;
+		  }	
+		  #content {
+          margin: 10px;
+          color: #6D6D6D;
+          padding: 0px 0px 20px;
+          font-size: 12px;
+      }
+      #content h1 {
+          padding-top: 6px;
+          font-family: HattoriHanzoLight;
+          color: #000;
+          text-shadow: 0px 1px 0px #EDEDED;
+          font-size: 27px;
+          font-weight: normal;
+          height: 32px;
+          padding:10px 0 5px 0;
+          letter-spacing: 1px;
+     }
+     #content h1 img {
+        vertical-align: top;
+     }
+		  
+		 #content .left, #content .right {
+        float: left;
+     }
+		  
+		 #content .bloc {
+        margin: 0px;
+        background-color: #FFF;
+        overflow: hidden;
+        box-shadow: 0px 5px 10px #AFAEAE;
+        color: #6D6D6D;
+     }
+     #content.white .bloc .title {
+        background: url('/images/content/white-title.png') repeat scroll 0% 0% transparent;
+        color: #2C2C2C;
+        text-shadow: 0px 1px #FFF;
+        font-weight: bold;
+        border: medium none;
+        height: 35px;
+        position: relative;
+        line-height: 34px;
+        padding: 0px 10px;
+        font-size: 15px;
+     }
+     #content .bloc .content {
+        padding: 10px;
+        background-color: #F7F7F7;
+     }
+    .cb, .clear {
+        clear: both;
+    }
+    #content .submit input, #content .button {
+        background: url('/images/content/buttons.png') repeat scroll left -68px transparent;
+        border: 1px solid #3580A9;
+        text-shadow: 0px -1px 0px #2C6AA3;
+        color: #D4E6EF;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0px 1px 5px #B2B2B2;
+    }
+    tr td {
+       height: 20px;
+       vertical-align: middle;
+      
+       font-size:14px;
+    }
+	  </style>	  
+	  
+</html>

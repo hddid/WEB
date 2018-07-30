@@ -1,0 +1,451 @@
+The target system is: Linux -  - 
+The host system is: Linux - 4.4.0-121-generic - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /home/will/pack/staging_dir/toolchain/bin/arm-openwrt-linux-gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/will/web/web/build/CMakeFiles/3.5.1/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /home/will/pack/staging_dir/toolchain/bin/arm-openwrt-linux-g++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/will/web/web/build/CMakeFiles/3.5.1/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_c00ed"
+[1/2] Building C object CMakeFiles/cmTC_c00ed.dir/testCCompiler.c.o
+[2/2] Linking C executable cmTC_c00ed
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_78539"
+[1/2] Building C object CMakeFiles/cmTC_78539.dir/CMakeCCompilerABI.c.o
+[2/2] Linking C executable cmTC_78539
+Reading specs from /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/specs
+COLLECT_GCC=/home/will/pack/staging_dir/toolchain/bin/arm-openwrt-linux-gcc
+COLLECT_LTO_WRAPPER=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper
+Target: arm-openwrt-linux-muslgnueabi
+Configured with: /home/darren/tina2/out/astar-parrot/compile_dir/toolchain/gcc-5.2.0/configure --with-bugurl=https://dev.openwrt.org/ --with-pkgversion='OpenWrt GCC 5.2.0 70-1-1' --prefix=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=arm-openwrt-linux-muslgnueabi --with-gnu-ld --enable-target-optspace --disable-libgomp --disable-libmudflap --disable-multilib --disable-nls --without-isl --without-cloog --with-host-libstdcxx=-lstdc++ --with-gmp=/home/darren/tina2/out/host --with-mpfr=/home/darren/tina2/out/host --with-mpc=/home/darren/tina2/out/host --disable-decimal-float --with-diagnostics-color=auto-if-env --disable-libssp --enable-__cxa_atexit --with-arch=armv7-a --with-float=hard --with-headers=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain/include --disable-libsanitizer --enable-languages=c,c++,fortran --enable-shared --enable-threads --with-slibdir=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain/lib --enable-lto --with-libelf=/home/darren/tina2/out/host
+Thread model: posix
+gcc version 5.2.0 (OpenWrt GCC 5.2.0 70-1-1) 
+COMPILER_PATH=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/:/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/bin/
+LIBRARY_PATH=/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_78539' '-rdynamic' '-march=armv7-a' '-mfloat-abi=hard' '-mtls-dialect=gnu'
+ /home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/collect2 -plugin /home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/liblto_plugin.so -plugin-opt=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbogqJw.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-musl-armhf.so.1 -X -m armelf_linux_eabi -o cmTC_78539 /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crt1.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crti.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtbegin.o -L /home/will/pack/staging_dir/usr/lib -rpath-link /home/will/pack/staging_dir/usr/lib -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0 -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib CMakeFiles/cmTC_78539.dir/CMakeCCompilerABI.c.o -lssp_nonshared -lgcc_s -lc -lgcc_s /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtend.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crtn.o
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(arm-openwrt-linux-ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/bin/ninja" "cmTC_78539"]
+  ignore line: [[1/2] Building C object CMakeFiles/cmTC_78539.dir/CMakeCCompilerABI.c.o]
+  ignore line: [[2/2] Linking C executable cmTC_78539]
+  ignore line: [Reading specs from /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/specs]
+  ignore line: [COLLECT_GCC=/home/will/pack/staging_dir/toolchain/bin/arm-openwrt-linux-gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper]
+  ignore line: [Target: arm-openwrt-linux-muslgnueabi]
+  ignore line: [Configured with: /home/darren/tina2/out/astar-parrot/compile_dir/toolchain/gcc-5.2.0/configure --with-bugurl=https://dev.openwrt.org/ --with-pkgversion='OpenWrt GCC 5.2.0 70-1-1' --prefix=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=arm-openwrt-linux-muslgnueabi --with-gnu-ld --enable-target-optspace --disable-libgomp --disable-libmudflap --disable-multilib --disable-nls --without-isl --without-cloog --with-host-libstdcxx=-lstdc++ --with-gmp=/home/darren/tina2/out/host --with-mpfr=/home/darren/tina2/out/host --with-mpc=/home/darren/tina2/out/host --disable-decimal-float --with-diagnostics-color=auto-if-env --disable-libssp --enable-__cxa_atexit --with-arch=armv7-a --with-float=hard --with-headers=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain/include --disable-libsanitizer --enable-languages=c,c++,fortran --enable-shared --enable-threads --with-slibdir=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain/lib --enable-lto --with-libelf=/home/darren/tina2/out/host]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 5.2.0 (OpenWrt GCC 5.2.0 70-1-1) ]
+  ignore line: [COMPILER_PATH=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/:/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/bin/]
+  ignore line: [LIBRARY_PATH=/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_78539' '-rdynamic' '-march=armv7-a' '-mfloat-abi=hard' '-mtls-dialect=gnu']
+  link line: [ /home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/collect2 -plugin /home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/liblto_plugin.so -plugin-opt=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbogqJw.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-musl-armhf.so.1 -X -m armelf_linux_eabi -o cmTC_78539 /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crt1.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crti.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtbegin.o -L /home/will/pack/staging_dir/usr/lib -rpath-link /home/will/pack/staging_dir/usr/lib -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0 -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib CMakeFiles/cmTC_78539.dir/CMakeCCompilerABI.c.o -lssp_nonshared -lgcc_s -lc -lgcc_s /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtend.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crtn.o]
+    arg [/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccbogqJw.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-musl-armhf.so.1] ==> ignore
+    arg [-X] ==> ignore
+    arg [-m] ==> ignore
+    arg [armelf_linux_eabi] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_78539] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crt1.o] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crti.o] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtbegin.o] ==> ignore
+    arg [-L/home/will/pack/staging_dir/usr/lib] ==> dir [/home/will/pack/staging_dir/usr/lib]
+    arg [-rpath-link] ==> ignore
+    arg [/home/will/pack/staging_dir/usr/lib] ==> ignore
+    arg [-L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0] ==> dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0]
+    arg [-L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc] ==> dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc]
+    arg [-L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib] ==> dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib]
+    arg [CMakeFiles/cmTC_78539.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lssp_nonshared] ==> lib [ssp_nonshared]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtend.o] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crtn.o] ==> ignore
+  remove lib [gcc_s]
+  remove lib [gcc_s]
+  collapse library dir [/home/will/pack/staging_dir/usr/lib] ==> [/home/will/pack/staging_dir/usr/lib]
+  collapse library dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0] ==> [/home/will/pack/staging_dir/toolchain/lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0]
+  collapse library dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc] ==> [/home/will/pack/staging_dir/toolchain/lib/gcc]
+  collapse library dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib] ==> [/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/lib]
+  implicit libs: [ssp_nonshared;c]
+  implicit dirs: [/home/will/pack/staging_dir/usr/lib;/home/will/pack/staging_dir/toolchain/lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0;/home/will/pack/staging_dir/toolchain/lib/gcc;/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_f0bf2"
+[1/2] Building C object CMakeFiles/cmTC_f0bf2.dir/feature_tests.c.o
+[2/2] Linking C executable cmTC_f0bf2
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_f2ac4"
+[1/2] Building C object CMakeFiles/cmTC_f2ac4.dir/feature_tests.c.o
+[2/2] Linking C executable cmTC_f2ac4
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_8ec06"
+[1/2] Building C object CMakeFiles/cmTC_8ec06.dir/feature_tests.c.o
+[2/2] Linking C executable cmTC_8ec06
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_62220"
+[1/2] Building CXX object CMakeFiles/cmTC_62220.dir/testCXXCompiler.cxx.o
+[2/2] Linking CXX executable cmTC_62220
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_a99da"
+[1/2] Building CXX object CMakeFiles/cmTC_a99da.dir/CMakeCXXCompilerABI.cpp.o
+[2/2] Linking CXX executable cmTC_a99da
+Reading specs from /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/specs
+COLLECT_GCC=/home/will/pack/staging_dir/toolchain/bin/arm-openwrt-linux-g++
+COLLECT_LTO_WRAPPER=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper
+Target: arm-openwrt-linux-muslgnueabi
+Configured with: /home/darren/tina2/out/astar-parrot/compile_dir/toolchain/gcc-5.2.0/configure --with-bugurl=https://dev.openwrt.org/ --with-pkgversion='OpenWrt GCC 5.2.0 70-1-1' --prefix=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=arm-openwrt-linux-muslgnueabi --with-gnu-ld --enable-target-optspace --disable-libgomp --disable-libmudflap --disable-multilib --disable-nls --without-isl --without-cloog --with-host-libstdcxx=-lstdc++ --with-gmp=/home/darren/tina2/out/host --with-mpfr=/home/darren/tina2/out/host --with-mpc=/home/darren/tina2/out/host --disable-decimal-float --with-diagnostics-color=auto-if-env --disable-libssp --enable-__cxa_atexit --with-arch=armv7-a --with-float=hard --with-headers=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain/include --disable-libsanitizer --enable-languages=c,c++,fortran --enable-shared --enable-threads --with-slibdir=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain/lib --enable-lto --with-libelf=/home/darren/tina2/out/host
+Thread model: posix
+gcc version 5.2.0 (OpenWrt GCC 5.2.0 70-1-1) 
+COMPILER_PATH=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/:/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/bin/
+LIBRARY_PATH=/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_a99da' '-rdynamic' '-shared-libgcc' '-march=armv7-a' '-mfloat-abi=hard' '-mtls-dialect=gnu'
+ /home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/collect2 -plugin /home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/liblto_plugin.so -plugin-opt=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper -plugin-opt=-fresolution=/tmp/cclVlBC5.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-musl-armhf.so.1 -X -m armelf_linux_eabi -o cmTC_a99da /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crt1.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crti.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtbegin.o -L /home/will/pack/staging_dir/usr/lib -rpath-link /home/will/pack/staging_dir/usr/lib -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0 -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib CMakeFiles/cmTC_a99da.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lssp_nonshared -lgcc_s -lc -lgcc_s /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtend.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crtn.o
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(arm-openwrt-linux-ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/bin/ninja" "cmTC_a99da"]
+  ignore line: [[1/2] Building CXX object CMakeFiles/cmTC_a99da.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [[2/2] Linking CXX executable cmTC_a99da]
+  ignore line: [Reading specs from /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/specs]
+  ignore line: [COLLECT_GCC=/home/will/pack/staging_dir/toolchain/bin/arm-openwrt-linux-g++]
+  ignore line: [COLLECT_LTO_WRAPPER=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper]
+  ignore line: [Target: arm-openwrt-linux-muslgnueabi]
+  ignore line: [Configured with: /home/darren/tina2/out/astar-parrot/compile_dir/toolchain/gcc-5.2.0/configure --with-bugurl=https://dev.openwrt.org/ --with-pkgversion='OpenWrt GCC 5.2.0 70-1-1' --prefix=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=arm-openwrt-linux-muslgnueabi --with-gnu-ld --enable-target-optspace --disable-libgomp --disable-libmudflap --disable-multilib --disable-nls --without-isl --without-cloog --with-host-libstdcxx=-lstdc++ --with-gmp=/home/darren/tina2/out/host --with-mpfr=/home/darren/tina2/out/host --with-mpc=/home/darren/tina2/out/host --disable-decimal-float --with-diagnostics-color=auto-if-env --disable-libssp --enable-__cxa_atexit --with-arch=armv7-a --with-float=hard --with-headers=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain/include --disable-libsanitizer --enable-languages=c,c++,fortran --enable-shared --enable-threads --with-slibdir=/home/darren/tina2/out/astar-parrot/staging_dir/toolchain/lib --enable-lto --with-libelf=/home/darren/tina2/out/host]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 5.2.0 (OpenWrt GCC 5.2.0 70-1-1) ]
+  ignore line: [COMPILER_PATH=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/:/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/bin/]
+  ignore line: [LIBRARY_PATH=/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/:/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_a99da' '-rdynamic' '-shared-libgcc' '-march=armv7-a' '-mfloat-abi=hard' '-mtls-dialect=gnu']
+  link line: [ /home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/collect2 -plugin /home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/liblto_plugin.so -plugin-opt=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper -plugin-opt=-fresolution=/tmp/cclVlBC5.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -export-dynamic -dynamic-linker /lib/ld-musl-armhf.so.1 -X -m armelf_linux_eabi -o cmTC_a99da /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crt1.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crti.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtbegin.o -L /home/will/pack/staging_dir/usr/lib -rpath-link /home/will/pack/staging_dir/usr/lib -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0 -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc -L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib CMakeFiles/cmTC_a99da.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lssp_nonshared -lgcc_s -lc -lgcc_s /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtend.o /home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crtn.o]
+    arg [/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/home/will/pack/staging_dir/toolchain/bin/../libexec/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cclVlBC5.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-musl-armhf.so.1] ==> ignore
+    arg [-X] ==> ignore
+    arg [-m] ==> ignore
+    arg [armelf_linux_eabi] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_a99da] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crt1.o] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crti.o] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtbegin.o] ==> ignore
+    arg [-L/home/will/pack/staging_dir/usr/lib] ==> dir [/home/will/pack/staging_dir/usr/lib]
+    arg [-rpath-link] ==> ignore
+    arg [/home/will/pack/staging_dir/usr/lib] ==> ignore
+    arg [-L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0] ==> dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0]
+    arg [-L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc] ==> dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc]
+    arg [-L/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib] ==> dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib]
+    arg [CMakeFiles/cmTC_a99da.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lssp_nonshared] ==> lib [ssp_nonshared]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/crtend.o] ==> ignore
+    arg [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib/crtn.o] ==> ignore
+  remove lib [gcc_s]
+  remove lib [gcc_s]
+  collapse library dir [/home/will/pack/staging_dir/usr/lib] ==> [/home/will/pack/staging_dir/usr/lib]
+  collapse library dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0] ==> [/home/will/pack/staging_dir/toolchain/lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0]
+  collapse library dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc] ==> [/home/will/pack/staging_dir/toolchain/lib/gcc]
+  collapse library dir [/home/will/pack/staging_dir/toolchain/bin/../lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0/../../../../arm-openwrt-linux-muslgnueabi/lib] ==> [/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/lib]
+  implicit libs: [stdc++;m;ssp_nonshared;c]
+  implicit dirs: [/home/will/pack/staging_dir/usr/lib;/home/will/pack/staging_dir/toolchain/lib/gcc/arm-openwrt-linux-muslgnueabi/5.2.0;/home/will/pack/staging_dir/toolchain/lib/gcc;/home/will/pack/staging_dir/toolchain/arm-openwrt-linux-muslgnueabi/lib]
+  implicit fwks: []
+
+
+
+
+Detecting CXX [-std=c++14] compiler features compiled with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_590c6"
+[1/2] Building CXX object CMakeFiles/cmTC_590c6.dir/feature_tests.cxx.o
+[2/2] Linking CXX executable cmTC_590c6
+
+
+    Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:1cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:1cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:1cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:1cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:1cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:1cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:1cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:1cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:1cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:1cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+
+
+Detecting CXX [-std=c++11] compiler features compiled with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_f17d5"
+[1/2] Building CXX object CMakeFiles/cmTC_f17d5.dir/feature_tests.cxx.o
+[2/2] Linking CXX executable cmTC_f17d5
+
+
+    Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:0cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:0cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:0cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:0cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:0cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:0cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:0cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:0cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:0cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:0cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+
+
+Detecting CXX [-std=c++98] compiler features compiled with the following output:
+Change Dir: /home/will/web/web/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/bin/ninja" "cmTC_18be8"
+[1/2] Building CXX object CMakeFiles/cmTC_18be8.dir/feature_tests.cxx.o
+[2/2] Linking CXX executable cmTC_18be8
+
+
+    Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:0cxx_alias_templates
+    Feature record: CXX_FEATURE:0cxx_alignas
+    Feature record: CXX_FEATURE:0cxx_alignof
+    Feature record: CXX_FEATURE:0cxx_attributes
+    Feature record: CXX_FEATURE:0cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:0cxx_auto_type
+    Feature record: CXX_FEATURE:0cxx_binary_literals
+    Feature record: CXX_FEATURE:0cxx_constexpr
+    Feature record: CXX_FEATURE:0cxx_contextual_conversions
+    Feature record: CXX_FEATURE:0cxx_decltype
+    Feature record: CXX_FEATURE:0cxx_decltype_auto
+    Feature record: CXX_FEATURE:0cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:0cxx_default_function_template_args
+    Feature record: CXX_FEATURE:0cxx_defaulted_functions
+    Feature record: CXX_FEATURE:0cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:0cxx_delegating_constructors
+    Feature record: CXX_FEATURE:0cxx_deleted_functions
+    Feature record: CXX_FEATURE:0cxx_digit_separators
+    Feature record: CXX_FEATURE:0cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:0cxx_explicit_conversions
+    Feature record: CXX_FEATURE:0cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:0cxx_extern_templates
+    Feature record: CXX_FEATURE:0cxx_final
+    Feature record: CXX_FEATURE:0cxx_func_identifier
+    Feature record: CXX_FEATURE:0cxx_generalized_initializers
+    Feature record: CXX_FEATURE:0cxx_generic_lambdas
+    Feature record: CXX_FEATURE:0cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:0cxx_inline_namespaces
+    Feature record: CXX_FEATURE:0cxx_lambdas
+    Feature record: CXX_FEATURE:0cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:0cxx_local_type_template_args
+    Feature record: CXX_FEATURE:0cxx_long_long_type
+    Feature record: CXX_FEATURE:0cxx_noexcept
+    Feature record: CXX_FEATURE:0cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:0cxx_nullptr
+    Feature record: CXX_FEATURE:0cxx_override
+    Feature record: CXX_FEATURE:0cxx_range_for
+    Feature record: CXX_FEATURE:0cxx_raw_string_literals
+    Feature record: CXX_FEATURE:0cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:0cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:0cxx_return_type_deduction
+    Feature record: CXX_FEATURE:0cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:0cxx_rvalue_references
+    Feature record: CXX_FEATURE:0cxx_sizeof_member
+    Feature record: CXX_FEATURE:0cxx_static_assert
+    Feature record: CXX_FEATURE:0cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:0cxx_thread_local
+    Feature record: CXX_FEATURE:0cxx_trailing_return_types
+    Feature record: CXX_FEATURE:0cxx_unicode_literals
+    Feature record: CXX_FEATURE:0cxx_uniform_initialization
+    Feature record: CXX_FEATURE:0cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:0cxx_user_literals
+    Feature record: CXX_FEATURE:0cxx_variable_templates
+    Feature record: CXX_FEATURE:0cxx_variadic_macros
+    Feature record: CXX_FEATURE:0cxx_variadic_templates

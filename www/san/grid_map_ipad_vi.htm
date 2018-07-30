@@ -1,0 +1,313 @@
+﻿<html>
+	<head>
+		<TITLE>SanKoBot</TITLE>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<meta content="user-scalable=0;" name="viewport" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="/js/jquery1.6.min.js"></script>
+	<script type="text/javascript" src="/jsLib/jqueryui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/jsLib/jqueryui/jqueryui.css" />
+	<script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	<link rel="shortcut icon" type="image/x-icon" href="/msa/logo.ico" />
+	<script type="text/javascript" src="/js/bctech_checkbox.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/bctech_checkbox.css">
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/js/waiteffect.js"></script>
+	<script type="text/javascript" src="/js/pubvalidate.js"></script>
+	<script type="text/javascript" src="/jsLib/sankobot.js"></script>
+	
+	<style type="text/css">
+		
+		#content table tbody tr td {
+			border-bottom: 1px solid rgba(0,0,0,0);;
+			border-top: 1px solid rgba(0,0,0,0);
+		}
+		#content table tbody tr:nth-child(2n+1) td {
+			background-color: rgba(0,0,0,0);
+		}
+		
+	</style>	  
+	  
+	<script type="text/javascript">
+		var canvas1;
+  		var canvas2;
+  		var canvas3;
+  		var canvas4;
+  		var canvas5;
+  		var canvas6;
+  		var context1;
+  		var context2;
+  		var context3;
+  		var context4;
+  		var context5;
+  		var context6;
+  		var img_id=1;
+  		var scale=50;
+  		var unit=10;
+	  	var tii=0;
+	  	var radius=2;
+	  	var num=1;
+	  	var ii_count=0;			//判断是实时显示还是离线地图
+	  	//unit=2
+	  	//24寸屏幕 
+	  	//1820/unit/20		*		840/unit/20=45.5M*21M=955平方
+	  	//14存屏幕
+	  	//1180/unit/20		*		480/unit/20=29.5M*12M=354平方
+	  	var can_width=2*(window.innerWidth-120);   
+	  	var can_height=2*(window.innerHeight-150);
+  		var x_offset=can_width*3.5;
+  		var y_offset=can_height*Math.round(25/unit);  
+  		var max_x=0;
+  		var max_y=0;
+  		var min_x=can_width;
+  		var min_y=can_height;
+	  	var xx=0;
+	  	var yy=0;
+	  	var status_color;
+	  	var Hz=20;
+	  	var a_goto_b_x=0;
+	  	var a_goto_b_y=0;
+	  	var line_speed=700;
+	  	var fp_map_offset=0;
+	  	var map_points_arr=new Array();
+		var map_points_count=0;
+		
+	  	$(document).ready(function() {
+		  	init_canvas(1650,1080);
+	  		
+	  		$("#get_screen")[0].style.width =can_width;
+	  		$("#get_screen")[0].style.height=can_height;
+	  		
+			window.document.onkeydown = disableRefresh;
+			
+			initdata();
+			
+	  		$(".panel")[0].style.top=130;
+	  		$(".panel")[0].style.left=80;
+	  		$(".window-shadow")[0].style.display="none";
+	  		$(".panel")[0].style.width=960;
+	  		$(".panel-body")[0].style.width=960;
+	  		$(".panel")[0].style.height=720;
+	  		$(".panel-body")[0].style.height=720;
+	  		
+			
+	  	});
+	  	
+		function initdata(){
+	  		$(".content")[0].style.height=can_height+250;	
+	  		$("#content")[0].style.height=can_height+250;  		
+	  		$(".bloc")[0].style.width=can_width+100;
+	  		
+	  		$("#gotoAB")[0].style.top=can_height-80;
+	  		$("#gotoAB")[0].style.left=can_width-200;	  		
+	  		//设置背景 	
+	  		var lGradient = context6.createLinearGradient(0,0,can_width,0);
+			lGradient.addColorStop(0,'#e0e0e0');
+			lGradient.addColorStop(1,'#d0d0d0');
+			context6.fillStyle = lGradient;
+			context6.fillRect(0,0,can_width,1080);
+			draw_white_grid(100,15);
+			//显示版本号
+			get_version();
+			//初始化地图文件(为加速做准备)
+			init_map_file();
+	  	} 
+	  	
+	  	function mycon(a,b)
+	  	{
+	  		console.log(a+"="+b);	
+	  	}
+	  	
+	  	
+	  	
+	  	function resize(xx,yy)
+		{
+		    var imgData1 = context1.getImageData(0,0,canvas1.width,canvas1.height);
+		    context1.putImageData(imgData1,xx,yy);
+		    var imgData2 = context2.getImageData(0,0,canvas2.width,canvas2.height);
+		    context2.putImageData(imgData2,xx,yy);
+		    var imgData3 = context3.getImageData(0,0,canvas3.width,canvas1.height);
+		    context3.putImageData(imgData3,xx,yy);
+		    var imgData4 = context4.getImageData(0,0,canvas4.width,canvas1.height);
+		    context4.putImageData(imgData4,xx,yy);
+		}
+		
+		
+	  	
+	  	
+	  	
+	  	function disableRefresh(evt){
+			evt = (evt) ? evt : window.event;
+			evt.stopPropagation();
+			evt.preventDefault();
+			if (evt.keyCode) {
+			   if(evt.keyCode == 90){
+			     //90 Z
+			     
+			   }
+			   if(evt.keyCode == 87){
+			     //87 W
+			     
+			   }
+			   
+			   
+			}
+		}
+	  	
+	  	
+
+	  	
+	  	function get_version(){
+	  		var config_path="/mnt/UDISK/config/.config";
+	  		$("#version_val").html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;版本号=version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;设备型号=type");	
+	  		get_config_val(config_path,"version");
+	  		get_config_val(config_path,"type");
+	  	}
+		</script>
+	</head>
+	 
+    <body style="/*overflow-y: hidden;*/">
+        <div id="content" class="white">
+            <h1 style="margin:0px 0px 0px 10px;"><img src="/icons/bookmarks-2.png" alt="" />
+            	&nbsp;&nbsp;&nbsp;SanKobot
+            </h1>
+            <div class="bloc"style="position: relative;top: -60px;">
+                <div class="title" style="z-index: 110;">
+                	<p>
+                    	<font id="version_val"color="#009100">
+  	                    	
+                    	</font>
+                    </p>
+                </div>                 
+                <div class="content" style="/*overflow-x: scroll;*/">
+                    <div class="input">
+                    	<table id="point_table"class="input"style="z-index: 180;position: relative;top: -20px;left: 70px;">		
+							<tr style="height: 100;">
+								
+								
+								<!--
+								
+               					-->
+								<td style="width: 10px;">
+								</td>
+								
+								<td style="width: 500px;">
+									<font style="font-size: x-large;">
+										Current Location：X
+									</font>
+								</td>
+									
+								<td style="width: 90px;">
+									<input id="slam_x" type="text" class="input" style="font-size: x-large;left: -265px;position: relative;width: 170px;height:56px" value="" >
+								</td>
+								
+								
+								<td style="position: relative;left: -245px;width: 40px;">
+									<font style="font-size: x-large;">
+										Y
+									</font>
+								</td>
+								
+								<td style="width: 90px;">
+									<input id="slam_y" type="text" class="input" style="font-size: x-large;left: -255px;position: relative;width: 170px;height:56px" value="" >
+								</td>
+								
+								<td style="position: relative;left: -240px;width: 80px;">
+									<font style="font-size: x-large;">
+										Yaw
+									</font>
+								</td>
+								<td style="width: 90px;">
+									<input id="theta" type="text" class="input" style="font-size: x-large;left: -260px;position: relative;width: 130px;height:56px" value="" >
+								</td>
+								
+								
+								
+								
+								<td >
+									
+								</td>
+							</tr>
+						</table>
+                    	<!--可视化界面-->
+                   		<div id="move_video"style="top:70px;z-index: 150;position: absolute;left: 30px;">
+                        	<img id="play_img"src="/san/img/show_video.gif" width="320" height="190">	
+                        	
+                        	
+			            	
+                        	<table class="input"style="position: relative;top: -470px;left: 25px;">	
+	                    		<tr>
+									
+								</tr>
+							</table>	
+							
+                        </div> 
+                        <div id="remote_win"class="easyui-window" title=""  style="width:800px;height:600px;padding:0px;">
+							<iframe scrolling="auto" id='openIframe' frameborder="0" src="http://192.168.1.199/san/vi_video.htm" style="width:100%;height:100%;"></iframe> 
+						</div>
+                        <!--A_goto_B按钮-->
+                        <div id="gotoAB"style="display:none;top:70px;z-index: 210;position: absolute;left: 30px;">
+                        	<img src="/san/img/a_goto_b.gif" width="200" height="200"onclick="goto_ab(a_goto_b_x,a_goto_b_y,line_speed)">	
+                        </div>
+                        <!--a_goto_b位置-->
+                        <div id="target"style="display:none;top:70px;z-index: 220;position: absolute;left: 30px;">
+                        	<img src="/san/img/target.gif" width="28" height="39">	
+                        </div> 
+                        <!--获取坐标点-->
+                   		<div id="get_screen"style="width:1820px;height:840px;top:65px;z-index: 200;position: absolute;left: 35px;">
+                        	
+							
+                        </div> 
+                    	
+                		<div id="init_width_set"style="top:126px;z-index: 100;position: absolute;left: 80px;">
+                        	<canvas id="canvas1"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;top: -50px;"></canvas>
+                        </div> 
+                        <div style="top: 76px;z-index: 90;position: absolute;left: 80px;">
+                        	<canvas id="canvas2"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+                        <div style="top: 76px;z-index: 80;position: absolute;left: 80px;">
+                        	<canvas id="canvas3"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+                        <div style="top: 76px;z-index: 70;position: absolute;left: 80px;">
+                        	<canvas id="canvas4"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+                        <div style="top: 76px;z-index: 60;position: absolute;left: 80px;">
+                        	<canvas id="canvas5"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div> 
+                        <div style="top: 76px;z-index: 50;position: absolute;left: 80px;">
+                        	<canvas id="canvas6"  style="width:1820px;height:840px;border:1px solid #aaa;display:block;margin:50 auto;position: relative;"></canvas>
+                        </div>
+	                </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+	        
+		    function handleTouchEvent(event) {
+			    //只跟踪一次触摸
+			    if (event.touches.length == 1) {
+			        var output = document.getElementById("get_screen");
+			        switch (event.type) {
+			            case "touchstart":
+			            	event.preventDefault(); //阻止滚动
+			                break;
+			            case "touchend":
+			            	event.preventDefault(); //阻止滚动
+			                break;
+			            case "touchmove":
+			                event.preventDefault(); //阻止滚动
+			                break;
+			        }
+			    }
+			}
+			document.addEventListener("touchstart", handleTouchEvent, false);
+			document.addEventListener("touchend", handleTouchEvent, false);
+			document.addEventListener("touchmove", handleTouchEvent, false);
+		</script>
+        
+    </body>
+</html>

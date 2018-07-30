@@ -1,0 +1,124 @@
+﻿<html>
+	<head>
+		<TITLE>SanKoBot</TITLE>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="/js/jquery1.6.min.js"></script>
+	<script type="text/javascript" src="/jsLib/jqueryui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/jsLib/jqueryui/jqueryui.css" />
+	<script type="text/javascript" src="/jsLib/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/jsLib/easyui/easyui-lang-zh_CN.js"></script>
+	<link rel="stylesheet" href="/jsLib/easyui/easyui.css" />
+	<link rel="shortcut icon" type="image/x-icon" href="/msa/logo.ico" />
+
+	<script type="text/javascript" src="/js/bctech_checkbox.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/bctech_checkbox.css">
+	<link rel="stylesheet" href="/css/content.css" />
+	<script type="text/javascript" src="/js/waiteffect.js"></script>
+	<script type="text/javascript" src="/js/pubvalidate.js"></script>
+	<style type="text/css">
+		
+		#content table tbody tr td {
+			border-bottom: 1px solid rgba(0,0,0,0);;
+			border-top: 1px solid rgba(0,0,0,0);
+		}
+		#content table tbody tr:nth-child(2n+1) td {
+			background-color: rgba(0,0,0,0);
+		}
+		
+	</style>	  
+	  
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+	  		initdata();
+			
+			
+	  	});
+	  	
+		function initdata(){
+	  		$(".content")[0].style.height=window.screen.availHeight-200;	 
+			get_test_id();
+	  	}
+	  	
+	  	function get_test_id()
+	  	{
+	  		$.ajax({
+			    type: "POST",
+			    url: "/sankobot/main.xp",
+			    dataType:'json',
+			    data:{
+			        'Fun':'get_test_id',
+			        'a':1
+			    },
+			    success: function (data){
+			        if(data=="err"){
+			        	alert("未能获取test-id");
+			        }else{
+			        	alert("test-id="+data);
+			        }
+			        	
+			        
+			    },
+			    error:function(){
+			    	
+			    }
+			}); 	
+	  	}
+	  		
+		function goto_grid_map(){
+			window.location.href = '/san/grid_map.htm';	
+		}
+		
+		</script>
+	</head>
+	
+    <body style="overflow-y: hidden;overflow-x: hidden;">
+        <div id="content" class="white">
+            <h1 style="margin:0px 0px 0px 10px;"><img src="/icons/bookmarks-2.png" alt="" />
+            	&nbsp;&nbsp;&nbsp;Save Log
+            </h1>
+            <div class="bloc"style="position: relative;top: -60px;">
+                <div class="title" style="z-index: 110;">
+                	<p>
+                    	<font color="#009100" id="version_val"style="font-size: smaller;">
+  	                    	<span style="left:10px;position:relative;">test-id</span>
+  	                    	<input id="test_id" type="text" class="input" style="width:80px;left:15px;top:-2px;position:relative;height:28px;" value="" >
+							<span style="left:30px;position:relative;">y</span>
+							<input id="draw_y" type="text" class="input" style="width:80px;left:35px;top:-2px;position:relative;height:28px;" value="" >
+							<button "type="button" class="button black1"style="width:80px;left:230px;top:2px;" onclick="reflash_map()">刷新</button>
+               				<button "type="button" class="button black1"style="width:80px;left:147px;top:45px;" onclick="goto_big_map()">大地图</button>
+               				<button "type="button" class="button black1"style="width:80px;left:64px;top:90px;" onclick="goto_grid_map()">栅格图</button>
+               				<input id="offset1" type="text" class="input" style="width:80px;left:76px;top:132px;position:relative;height:28px;" value="5" >
+							<button "type="button" class="button black1"style="width:80px;left:-102px;top:135px;" onclick="move_map(1)">↑</button>			
+               				<input id="offset2" type="text" class="input" style="width:80px;left:-91px;top:177px;position:relative;height:28px;" value="5" >
+							<button "type="button" class="button black1"style="width:80px;left:-270px;top:180px;" onclick="move_map(2)">↓</button>
+               				
+               				<input id="offset3" type="text" class="input" style="width:80px;left:-258px;top:224px;position:relative;height:28px;" value="5" >
+							<button "type="button" class="button black1"style="width:80px;left:-436px;top:225px;" onclick="move_map(3)">←</button>
+               				
+               				<input id="offset4" type="text" class="input" style="width:80px;left:1182px;top:233px;position:relative;height:28px;" value="5" >
+							<button "type="button" class="button black1"style="width:80px;left:1004px;top:235px;" onclick="move_map(4)">→</button>
+               				
+  	                    </font>
+                    			
+                    </p>
+                </div>                 
+                <div class="content" style="">
+                    <div class="input">
+                    	
+                    	
+                    	
+                        
+	                </div>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+	        
+		    
+		</script>
+    </body>

@@ -1,0 +1,34 @@
+#!/usr/bin/expect  
+set timeout 10  
+set host [lindex $argv 0]
+spawn scp bin/web2ui root@192.168.$host:/usr/bin/web2ui 
+ expect {  
+ "(yes/no)?"  
+  {  
+    send "yes\n"  
+    expect "*assword:" { send " \n"}  
+  }  
+ "*assword:"  
+  {  
+    send " \n"  
+  }  
+} 
+expect "100%"  
+
+spawn scp lib/libWeb.so root@192.168.$host:/usr/lib/.
+ expect {  
+ "(yes/no)?"  
+  {  
+    send "yes\n"  
+    expect "*assword:" { send " \n"}  
+  }  
+ "*assword:"  
+  {  
+    send " \n"  
+  }  
+} 
+expect "100%"  
+
+expect eof 
+
+ 
