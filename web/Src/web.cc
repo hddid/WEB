@@ -6,6 +6,8 @@ char CThread_web::send_buf[31000];
 char CThread_web::ifname[64];
 char CThread_web::map_file_csv_path[128];
 
+//share_memory_api snake_map_point search_parameter 区分地图颜色 dis_arr
+
 
 //升序
 static int asc_jpg_file ( const void *a , const void *b) 
@@ -19,7 +21,7 @@ static int NumDescSort(const void * a,const void * b)
 }  	
 	
 CThread_web::CThread_web()
-{
+{   //内存空间初始化，sizeof文件或数据占的内存
 	memset(&web_ctrl_info,0,sizeof(Web_Ctrl_Struct));
     memset(total_data,0,sizeof(total_data));
     memset(snake_map_point,0,sizeof(snake_map_point));
@@ -56,17 +58,27 @@ CThread_web::~CThread_web()
 	
 }
 
-int CThread_web::remove_all_jpg_file(const char *path){
+//删除图片
+int CThread_web::remove_all_jpg_file(const char *path)
+{
 	char remove_path[64]={0};
-	DIR *pDir;
+	//dirent结构体d_name表示文件名
 	struct dirent  *ent;
+	DIR *pDir;	
+	//opendir打开参数指定的目录，返回DIR*形态的目录流，
+	//接下来对目录的搜索和读取都要使用该返回值
     pDir=opendir(path);
-    if(pDir  == NULL){
+    if(pDir  == NULL)
+	{
 		return 0;
 	}
-    while((ent=readdir(pDir))){
-        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)continue; 
-        if(ent->d_type ==8){
+    while((ent=readdir(pDir)))
+	{
+        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)
+			continue; 
+		//d_type表示档案类型
+        if(ent->d_type ==8)
+		{	//数值连接
         	sprintf(remove_path,"%s/%s",path,ent->d_name);
         	remove(remove_path);
         }
@@ -75,20 +87,26 @@ int CThread_web::remove_all_jpg_file(const char *path){
 	return 0;	
 }
 
+//判断平台并获取ip地址
 void* CThread_web::process_CThread_web(int mode)
 {
-	if(mode==0){//R16平台
+	if(mode==0)
+	{//R16平台
 		strcpy(ifname,"wlan0");
 		strcpy(map_file_csv_path,"/tmp/data/map_file.csv");
-	}else if(mode==1){//ubuntu本机调试
+	}
+	else if(mode==1)
+	{//ubuntu本机调试
 		strcpy(ifname,"lo");
 		strcpy(map_file_csv_path,"map_file.csv");
 	}
 	char ip[64]={0};
 	//1	获取wlan0网卡ip地址
-	while(1){
+	while(1)
+	{
 		get_server_ip(ip,ifname);	
-		if(0!=strcmp(ip,"")){
+		if(0!=strcmp(ip,""))
+		{
 			break;
 		}
 		sleep(1);
@@ -107,10 +125,12 @@ int CThread_web::make_send_buf(char parameter[][64])
 {
 	char msg_lenth[64];
 	char fun[64]={0};
+	//初始化内存
 	memset(msg_lenth, 0, sizeof(msg_lenth));
 	memset(total_data, 0, sizeof(total_data));
 	if(search_parameter(parameter,"Fun"))
 	{
+		//将获取的Fun函数传给fun
 		strcpy(fun,search_parameter(parameter,"Fun"));
 			
 		//显示slam栅格图
@@ -130,6 +150,7 @@ int CThread_web::make_send_buf(char parameter[][64])
                 return -1;
             else
             {
+				//复制web_ctrl_info到pweb_shm
                 memcpy(&pweb_shm->web_ctrl_data, &web_ctrl_info, sizeof(web_ctrl_info));
                 //printf("\n\nctrl_mode=%d\n",pweb_shm->web_ctrl_data.ctrl_mode);
                 pweb_shm->web_ctrl_data.newfg = 1;
@@ -189,14 +210,12 @@ int CThread_web::make_send_buf(char parameter[][64])
 		
 		//show_door  
 		if(0 == strcmp("show_door",fun))
-			show_door(parameter);
-			
-			
-			
+			show_door(parameter);		
 			
 	}	
 	memset(send_buf,0,sizeof(send_buf));
 	sprintf(msg_lenth,"Content-Length: %d\r\n\r\n",(int)strlen(total_data));
+	//strcat将后面的字符串追加给前面的字符串
 	strcat(send_buf,"HTTP/1.1 200 OK\r\n");
 	strcat(send_buf, msg_lenth);
 	strcat(send_buf, total_data);
@@ -205,7 +224,6 @@ int CThread_web::make_send_buf(char parameter[][64])
 }
 
 //漂移计算
-
 int CThread_web::caculate(char *result)
 {
 	int pre_x=0;
@@ -231,38 +249,48 @@ int CThread_web::caculate(char *result)
 	memset(tempRow,0,sizeof(tempRow));
 	FILE *fp_r= NULL;
 	fp_r = fopen("/tmp/data/map_points.csv", "r");
-    if(!fp_r){
+    if(!fp_r)
+	{
         printf("read map_points file error\n"); 
         return -1;
     }
     
     FILE *fp_w1 = NULL;
     fp_w1 = fopen("/tmp/data/dis_unusual_count.csv", "w");
-	if(!fp_w1){
+	if(!fp_w1)
+	{
         printf("write map_test_result file error\n");
         return -1;
     }
     FILE *fp_w2 = NULL;
     fp_w2 = fopen("/tmp/data/theta_unusual_count.csv", "w");
-	if(!fp_w2){
+	if(!fp_w2)
+	{
         printf("write map_test_result file error\n");
         return -1;
     }
     
-	while(fgets(tempRead, sizeof(tempRead), fp_r)) {
+	while(fgets(tempRead, sizeof(tempRead), fp_r)) 
+	{
         while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
         	tempRead[strlen(tempRead) - 1] = '\0';
-        if(tempRead[0] == '\0') {
+        if(tempRead[0] == '\0') 
+		{
             continue;
         }
-        if(++total_point_count>20){
-	        sscanf(tempRead, "%s%s%s%s%s%s%s%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3],tempRow[4], tempRow[5],tempRow[6], tempRow[7]);
-	        if(total_point_count==21){
+        if(++total_point_count>20)
+		{
+	        sscanf(tempRead, "%s%s%s%s%s%s%s%s",tempRow[0],tempRow[1],
+			tempRow[2],tempRow[3],tempRow[4], tempRow[5],tempRow[6], tempRow[7]);
+	        if(total_point_count==21)
+			{
 				pre_x=atoi(tempRow[1]);
 				pre_y=atoi(tempRow[2]);
 				pre_theta=atoi(tempRow[3]);
 				pre_timestamp=atol(tempRow[7]);
-			}else{
+			}
+			else
+			{
 				now_x=atoi(tempRow[1]);
 				now_y=atoi(tempRow[2]);
 				now_theta=atoi(tempRow[3]);
@@ -270,23 +298,31 @@ int CThread_web::caculate(char *result)
 				int deta_timestamp=(int)((now_timestamp-pre_timestamp)/1000);
 				//printf("deta=%d\n",deta_timestamp);
 				dis_xy=sqrt((now_x-pre_x)*(now_x-pre_x)+(now_y-pre_y)*(now_y-pre_y));
-				if(pre_theta-now_theta>18000){
+				if(pre_theta-now_theta>18000)
+				{
 					dis_theta=pre_theta-now_theta-36000>0?pre_theta-now_theta-36000:now_theta-pre_theta+36000;
-				}else if(pre_theta-now_theta<-18000){
+				}
+				else if(pre_theta-now_theta<-18000)
+				{
 					dis_theta=pre_theta-now_theta+36000>0?pre_theta-now_theta+36000:now_theta-pre_theta-36000;
-				}else{
+				}else
+				{
 					dis_theta=pre_theta-now_theta>0?pre_theta-now_theta:now_theta-pre_theta;
 				}
-				if(dis_xy>max_dis_xy)max_dis_xy=dis_xy;
-				if(dis_theta>max_theta)max_theta=dis_theta;
-				sum_dis_xy+=dis_xy;
-				sum_theta+=dis_theta;
-				if(dis_xy>5*deta_timestamp&&deta_timestamp!=0){
+				if(dis_xy>max_dis_xy)
+					max_dis_xy=dis_xy;
+				if(dis_theta>max_theta)
+					max_theta=dis_theta;
+					sum_dis_xy+=dis_xy;
+					sum_theta+=dis_theta;
+				if(dis_xy>5*deta_timestamp&&deta_timestamp!=0)
+				{
 					++dis_unusual_count;
 					fputs(tempRead,fp_w1);	
 					fputs("\n",fp_w1);	
 				}
-				if(dis_theta>10*deta_timestamp&&deta_timestamp!=0){
+				if(dis_theta>10*deta_timestamp&&deta_timestamp!=0)
+				{
 					++theta_unusual_count;
 					fputs(tempRead,fp_w2);	
 					fputs("\n",fp_w2);	
@@ -301,17 +337,18 @@ int CThread_web::caculate(char *result)
 	fclose(fp_r);
 	fclose(fp_w1); 
 	fclose(fp_w2);	
-	sprintf(result,",\"average_dis_xy\":\"%d\",\"average_theta\":\"%.3f\",\"max_dis_xy\":\"%d\",\"max_theta\":\"%d\",\"total_point_count\":\"%d\",\"dis_unusual_count\":\"%d\",\"theta_unusual_count\":\"%d\"",(int)(sum_dis_xy/(long)(total_point_count-21)),(float)((double)sum_theta/(double)(total_point_count-21)),max_dis_xy,max_theta,total_point_count-20,dis_unusual_count,theta_unusual_count);
+	sprintf(result,",\"average_dis_xy\":\"%d\",\"average_theta\":\"%.3f\",\"max_dis_xy\":\"%d\",\"max_theta\":\"%d\",\"total_point_count\":\"%d\",\"dis_unusual_count\":\"%d\",\"theta_unusual_count\":\"%d\"",
+	(int)(sum_dis_xy/(long)(total_point_count-21)),(float)((double)sum_theta/(double)(total_point_count-21)),max_dis_xy,max_theta,total_point_count-20,dis_unusual_count,theta_unusual_count);
 	return 0;
 }
 
 //差值划线连接手画图
-
 int CThread_web::draw_middle_snake_point(int x,int y,int pre_x,int pre_y)
 {
 	int deta_x=x-pre_x>0?x-pre_x:pre_x-x;
 	int deta_y=y-pre_y>0?y-pre_y:pre_y-y;
-	if(deta_x>1||deta_y>1){
+	if(deta_x>1||deta_y>1)
+	{
 		snake_map_point[(pre_y+y)/2][(pre_x+x)/2].status=0x93;
 		snake_map_point[(pre_y+y)/2][(pre_x+x)/2+1].status=0x93;
 		snake_map_point[(pre_y+y)/2][(pre_x+x)/2+2].status=0x93;
@@ -328,38 +365,50 @@ int CThread_web::draw_middle_snake_point(int x,int y,int pre_x,int pre_y)
 }
 
 //生成手画边界地图
-
 int CThread_web::make_hand_draw_map(char parameter[][64])
 {
-	
 	int x=0;
 	int y=0;
 	int i=0;
 	int j=0;
-	if(search_parameter(parameter,"x"))x=atoi(search_parameter(parameter,"x"));else	printf("can not get x in fun make_hand_draw_map line=%d\n",__LINE__);
-	if(search_parameter(parameter,"y"))y=atoi(search_parameter(parameter,"y"));else	printf("can not get y in fun make_hand_draw_map line=%d\n",__LINE__);
+	if(search_parameter(parameter,"x"))
+		x=atoi(search_parameter(parameter,"x"));
+	else	
+		printf("can not get x in fun make_hand_draw_map line=%d\n",__LINE__);
+	if(search_parameter(parameter,"y"))
+		y=atoi(search_parameter(parameter,"y"));
+	else	
+		printf("can not get y in fun make_hand_draw_map line=%d\n",__LINE__);
 			
-	if(search_parameter(parameter,"where")){
-		if(0==strcmp("head",search_parameter(parameter,"where"))){
+	if(search_parameter(parameter,"where"))
+	{
+		if(0==strcmp("head",search_parameter(parameter,"where")))
+		{
 			memset(snake_map_point,0,sizeof(snake_map_point));
-			for(i=0;i<1024;++i){
-				for(j=0;j<11;++j){
+			for(i=0;i<1024;++i)
+			{
+				for(j=0;j<11;++j)
+				{
 					snake_map_point[j][i].status=0xf3;
 					snake_map_point[i][j].status=0xf3;
 				}
-				for(j=0;j<12;++j){
+				for(j=0;j<12;++j)
+				{
 					snake_map_point[1012+j][i].status=0xf3;
 					snake_map_point[i][j+1012].status=0xf3;
 				}
 			}
 			//printf("head	x=%d	y=%d\n",x,y);
-			if(x>=11&&x<=1011&&y>=11&&y<=1011){
+			if(x>=11&&x<=1011&&y>=11&&y<=1011)
+			{
 				snake_map_point[y][x].status=0x93;
 				snake_map_point[y][x+1].status=0x93;
 				snake_map_point_pre_x=x;
 				snake_map_point_pre_y=y;
 			}
-		}else if(0==strcmp("body",search_parameter(parameter,"where"))){
+		}
+		else if(0==strcmp("body",search_parameter(parameter,"where")))
+		{
 			//printf("body	x=%d	y=%d\n",x,y);
 			//printf("body	px=%d	py=%d\n",snake_map_point_pre_x,snake_map_point_pre_y);
 			snake_map_point[y][x].status=0x93;
@@ -371,22 +420,27 @@ int CThread_web::make_hand_draw_map(char parameter[][64])
 			snake_map_point[y-1][x].status=0x93;
 			snake_map_point[y-1][x+1].status=0x93;
 			snake_map_point[y-1][x+2].status=0x93;
-			if(x-snake_map_point_pre_x>1||x-snake_map_point_pre_x<-1||y-snake_map_point_pre_y>1||y-snake_map_point_pre_y<-1){
+			if(x-snake_map_point_pre_x>1||x-snake_map_point_pre_x<-1||y-snake_map_point_pre_y>1||y-snake_map_point_pre_y<-1)
+			{
 				draw_middle_snake_point(x,y,snake_map_point_pre_x,snake_map_point_pre_y);
 			}
 			snake_map_point_pre_x=x;
 			snake_map_point_pre_y=y;
-		}else if(0==strcmp("tail",search_parameter(parameter,"where"))){
+		}
+		else if(0==strcmp("tail",search_parameter(parameter,"where")))
+		{
 			printf("make_hand_draw_map tail\n");
 			FILE *fp = NULL;
 		    fp = fopen(map_file_csv_path, "w");
-			if(!fp){
+			if(!fp)
+			{
 		        printf("write  file error in fun make_hand_draw_map\n");
 		        strcat(total_data,"1"); 
 		        return -1;
 		    }
 		    int i=0;
 		    for(i=0;i<1024;++i)
+				//指向数据的指针，每个数据的大小，数据个数，文件指针
 		    	fwrite(&snake_map_point[i][0],sizeof(uint32_t),1024,fp);
 		    fclose(fp);
 		    strcat(total_data,"{\"status\":\"SAVE_OK\"}"); 
@@ -397,36 +451,57 @@ int CThread_web::make_hand_draw_map(char parameter[][64])
 	return 0;	
 }
 
+//区分地图颜色
 int CThread_web::decode_map_color(uint8_t state,char *color)
 {
-	if(0==(state&0x0F)){
+	if(0==(state&0x0F))
+	{
 		//未知区域	白色
 		sprintf(color,"#FFFFFF");
-	}else if(1==(state&0x0F)){
+	}
+	else if(1==(state&0x0F))
+	{
 		//未清扫	青色
 		sprintf(color,"#408080");
-	}else if(2==(state&0x0F)){
+	}
+	else if(2==(state&0x0F))
+	{
 		//已清扫	绿色
 		sprintf(color,"#82d900");
-	}else if(3==(state&0x0F)){
-		//障碍		黑色
+	}
+	else if(3==(state&0x0F))
+	{
+		//障碍		黑色//没有体现
 		int depth=((state&0xF0)>>4);//黑色的深度
 		//printf("depth=%d\n",depth);
-		if(depth>=8)sprintf(color,"#000000");
-		if(depth==7)sprintf(color,"#272727");
-		if(depth==6)sprintf(color,"#3C3C3C");
-		if(depth==5)sprintf(color,"#4F4F4F");
-		if(depth==4)sprintf(color,"#5B5B5B");
-		if(depth==3)sprintf(color,"#6C6C6C");
-		if(depth==2)sprintf(color,"#7B7B7B");
-		if(depth==1)sprintf(color,"#8E8E8E");
-		if(depth==0)sprintf(color,"#8E8E8E");
-	}else if(0x0E==(state&0x0F)){
+		if(depth>=8)
+			sprintf(color,"#000000");
+		if(depth==7)
+			sprintf(color,"#272727");
+		if(depth==6)
+			sprintf(color,"#3C3C3C");
+		if(depth==5)
+			sprintf(color,"#4F4F4F");
+		if(depth==4)
+			sprintf(color,"#5B5B5B");
+		if(depth==3)
+			sprintf(color,"#6C6C6C");
+		if(depth==2)
+			sprintf(color,"#7B7B7B");
+		if(depth==1)
+			sprintf(color,"#8E8E8E");
+		if(depth==0)
+			sprintf(color,"#8E8E8E");
+	}
+	else if(0x0E==(state&0x0F))
+	{
 		//线条	紫色
 		sprintf(color,"#6C3365");
 	}	
 	return 0;
 }
+
+
 int CThread_web::str_to_json(MapPoints *tempRead,FILE *fp_w,int line_count)
 {
 	char unit_data[128]={0};
@@ -442,13 +517,15 @@ int CThread_web::str_to_json(MapPoints *tempRead,FILE *fp_w,int line_count)
 			decode_map_color(state,color);
 			sprintf(unit_data,",{\"val\":\"%d$%s\"}",i-begin,color);
 			fputs(unit_data,fp_w);
-			if(i==line_count)break;
+			if(i==line_count)
+				break;
 			begin=i;
 			state=tempRead[i].status;
 		}
 	}
 	return 0;
 }
+
 
 int CThread_web::decode_one_line_map_data(FILE* fp_r,FILE* fp_w)
 {
@@ -462,14 +539,16 @@ int CThread_web::decode_one_line_map_data(FILE* fp_r,FILE* fp_w)
     return 0;
 }
 
-
+//获取地图文件
 int CThread_web::get_map_file(char parameter[][64])
-{
+{	
+	//判断有没有json文件
 	make_json_dir();
 	char unit_data[256]={0};
 	FILE *fp_r= NULL;
 	fp_r = fopen(map_file_csv_path,"r");
-    if(!fp_r){
+    if(!fp_r)
+	{
         sprintf(unit_data,"{\"status\":\"EMPTY MAP\"}"); 
 		strcat(total_data,unit_data);   
         return 0;
@@ -477,7 +556,8 @@ int CThread_web::get_map_file(char parameter[][64])
     
     FILE *fp_w = NULL;
     fp_w = fopen("/tmp/data/json/map_file.json","w");
-	if(!fp_w){
+	if(!fp_w)
+	{
         printf("write map_file.json file error\n");
         sprintf(unit_data,"{\"status\":\"err2\"}");
 		strcat(total_data,unit_data);   
@@ -499,21 +579,29 @@ int CThread_web::get_map_file(char parameter[][64])
 	return 0;
 }
 
-
+//小地图文件
 int CThread_web::get_small_map_file(char parameter[][64])
 {
 	int theta_x=0;//theta_x<450
 	int theta_y=0;//theta_y<450
 	int offset=512;
-	if(search_parameter(parameter,"theta_x"))theta_x=atoi(search_parameter(parameter,"theta_x"));else	printf("can not get theta_x in fun get_small_map_fil line=%d\n",__LINE__);
-	if(search_parameter(parameter,"theta_y"))theta_y=atoi(search_parameter(parameter,"theta_y"));else	printf("can not get theta_y in fun get_small_map_fil line=%d\n",__LINE__);
+	if(search_parameter(parameter,"theta_x"))
+		theta_x=atoi(search_parameter(parameter,"theta_x"));
+	else	
+		printf("can not get theta_x in fun get_small_map_fil line=%d\n",__LINE__);
+	if(search_parameter(parameter,"theta_y"))
+		theta_y=atoi(search_parameter(parameter,"theta_y"));
+	else	
+		printf("can not get theta_y in fun get_small_map_fil line=%d\n",__LINE__);
 	
+	//获取json文件
 	make_json_dir();
 	char unit_data[256]={0};
 	FILE *fp_r= NULL;
 	//fp_r = fopen("/tmp/data/map_file.csv","r");
     fp_r = fopen(map_file_csv_path,"r");
-    if(!fp_r){
+    if(!fp_r)
+	{
         sprintf(unit_data,"{\"status\":\"EMPTY MAP\"}"); 
 		strcat(total_data,unit_data);   
         return 0;
@@ -521,7 +609,8 @@ int CThread_web::get_small_map_file(char parameter[][64])
     
     FILE *fp_w = NULL;
     fp_w = fopen("/tmp/data/json/small_map_file.json","w");
-	if(!fp_w){
+	if(!fp_w)
+	{
         printf("write map_file.json file error\n");
         sprintf(unit_data,"{\"status\":\"err2\"}");
 		strcat(total_data,unit_data);   
@@ -534,7 +623,8 @@ int CThread_web::get_small_map_file(char parameter[][64])
     MapPoints tempRead[256]={0};
     for(i=0;i<offset-50+theta_y;++i)
     {
-    	for(j=0;j<4;++j){
+    	for(j=0;j<4;++j)
+		{
     		fread(tempRead,sizeof(uint32_t),256,fp_r);
     	}
     }
@@ -545,7 +635,8 @@ int CThread_web::get_small_map_file(char parameter[][64])
     int back_ten_i=(offset-51-theta_x)%200;
     for(i=0;i<101;++i)
     {
-    	for(j=0;j<front_hundred_i;++j){
+    	for(j=0;j<front_hundred_i;++j)
+		{
     		fread(tempRead,sizeof(uint32_t),200,fp_r);
     	}
     	fread(tempRead,sizeof(uint32_t),front_ten_i,fp_r);
@@ -553,7 +644,8 @@ int CThread_web::get_small_map_file(char parameter[][64])
     	fread(tempRead,sizeof(uint32_t),101,fp_r);
     	str_to_json(tempRead,fp_w,101);
     	
-    	for(j=0;j<back_hundred_i;++j){
+    	for(j=0;j<back_hundred_i;++j)
+		{
     		fread(tempRead,sizeof(uint32_t),200,fp_r);
     	}
     	fread(tempRead,sizeof(uint32_t),back_ten_i,fp_r);
@@ -568,33 +660,49 @@ int CThread_web::get_small_map_file(char parameter[][64])
 	return 0;	
 }
 
+//画细线
 int CThread_web::draw_small_line(int x1,int y1,int x2,int y2,int x_offset,int y_offset)
 {
-	if(x1-x2>1||x1-x2<-1||y1-y2>1||y1-y2<-1){
+	if(x1-x2>1||x1-x2<-1||y1-y2>1||y1-y2<-1)
+	{
 		snake_map_point[(y1+y2)/2+y_offset][(x1+x2)/2+x_offset].status=0x93;
 		draw_small_line(((x1+x2)/2),((y1+y2)/2),x2,y2,x_offset,y_offset);
 		draw_small_line(x1,y1,((x1+x2)/2),((y1+y2)/2),x_offset,y_offset);
 	}
 	return 0;
 }
-float CThread_web::get_diff(int x1,int y1,int x2,int y2,float mx,float my){
+
+
+float CThread_web::get_diff(int x1,int y1,int x2,int y2,float mx,float my)
+{
 	float a=sqrt(((float)x1-mx)*((float)x1-mx)+((float)y1-my)*((float)y1-my));
 	float b=sqrt((mx-(float)x2)*(mx-(float)x2)+(my-(float)y2)*(my-(float)y2));
 	return a-b>0.0?a-b:b-a;
 }
 
-int CThread_web::draw_big_line_direction(int x1,int y1,int x2,int y2,int dir,int x_offset,int y_offset){
-	if(dir==0)draw_small_line(x1-1,y1-1,x2-1,y2-1,x_offset,y_offset);
-	if(dir==1)draw_small_line(x1,y1-1,x2,y2-1,x_offset,y_offset);
-	if(dir==2)draw_small_line(x1+1,y1-1,x2+1,y2-1,x_offset,y_offset);
-	if(dir==3)draw_small_line(x1+1,y1,x2+1,y2,x_offset,y_offset);
-	if(dir==4)draw_small_line(x1+1,y1+1,x2+1,y2+1,x_offset,y_offset);
-	if(dir==5)draw_small_line(x1,y1+1,x2,y2+1,x_offset,y_offset);
-	if(dir==6)draw_small_line(x1-1,y1+1,x2-1,y2+1,x_offset,y_offset);
-	if(dir==7)draw_small_line(x1-1,y1,x2-1,y2,x_offset,y_offset);
+
+int CThread_web::draw_big_line_direction(int x1,int y1,int x2,int y2,int dir,int x_offset,int y_offset)
+{
+	if(dir==0)
+		draw_small_line(x1-1,y1-1,x2-1,y2-1,x_offset,y_offset);
+	if(dir==1)
+		draw_small_line(x1,y1-1,x2,y2-1,x_offset,y_offset);
+	if(dir==2)
+		draw_small_line(x1+1,y1-1,x2+1,y2-1,x_offset,y_offset);
+	if(dir==3)
+		draw_small_line(x1+1,y1,x2+1,y2,x_offset,y_offset);
+	if(dir==4)
+		draw_small_line(x1+1,y1+1,x2+1,y2+1,x_offset,y_offset);
+	if(dir==5)
+		draw_small_line(x1,y1+1,x2,y2+1,x_offset,y_offset);
+	if(dir==6)
+		draw_small_line(x1-1,y1+1,x2-1,y2+1,x_offset,y_offset);
+	if(dir==7)
+		draw_small_line(x1-1,y1,x2-1,y2,x_offset,y_offset);
 	return 0;	
 }
 
+//画粗线
 int CThread_web::draw_big_line(int x1,int y1,int x2,int y2,int x_offset,int y_offset)
 {
 	float mx=(float)(x1+x2)/2.0;
@@ -622,20 +730,28 @@ int CThread_web::draw_big_line(int x1,int y1,int x2,int y2,int x_offset,int y_of
 	int hate_you=0;
 	qsort(dis_arr,8,sizeof(float),NumDescSort);	
 	int i=0;
-	for(i=0;i<8;++i){
-		if(dis_arr[0]!=dis_arr[1]){
-			if(flag_arr[i]==dis_arr[0]){
+	for(i=0;i<8;++i)
+	{
+		if(dis_arr[0]!=dis_arr[1])
+		{
+			if(flag_arr[i]==dis_arr[0])
+			{
 				f1=i;
 			}
-			if(flag_arr[i]==dis_arr[1]){
+			if(flag_arr[i]==dis_arr[1])
+			{
 				f2=i;
 			}
-		}else{
-			if(hate_you==0&&flag_arr[i]==dis_arr[0]){
+		}
+		else
+		{
+			if(hate_you==0&&flag_arr[i]==dis_arr[0])
+			{
 				f1=i;
 				hate_you=1;
 			}
-			if(hate_you==1&&flag_arr[i]==dis_arr[0]){
+			if(hate_you==1&&flag_arr[i]==dis_arr[0])
+			{
 				f2=i;
 			}
 		}
@@ -644,6 +760,8 @@ int CThread_web::draw_big_line(int x1,int y1,int x2,int y2,int x_offset,int y_of
 	draw_big_line_direction(x1,y1,x2,y2,f2,x_offset,y_offset);	
 	return 0;
 }
+
+//画矩形
 int CThread_web::draw_fang(int x1,int y1,int x2,int y2,int x_offset,int y_offset)
 {
 	int i=0;
@@ -668,21 +786,52 @@ int CThread_web::draw_fang(int x1,int y1,int x2,int y2,int x_offset,int y_offset
 	}
 	return 0;	
 }
-//保存地图
-int CThread_web::save_map_file(char parameter[][64]){
+
+//保存地图(手画地图)
+int CThread_web::save_map_file(char parameter[][64])
+{
 	char unit_data[256]={0};
 	int fun_code=0,x1=0,y1=0,x2=0,y2=0,x_offset=0,y_offset=0;
-	if(search_parameter(parameter,"fun_code"))fun_code=atoi(search_parameter(parameter,"fun_code"));else	printf("can not get fun_code in fun save_map_file line=%d\n",__LINE__);
-	if(search_parameter(parameter,"x1"))x1=atoi(search_parameter(parameter,"x1"));else	printf("can not get x1 in fun save_map_file line=%d\n",__LINE__);
-	if(search_parameter(parameter,"y1"))y1=atoi(search_parameter(parameter,"y1"));else	printf("can not get y1 in fun save_map_file line=%d\n",__LINE__);
-	if(search_parameter(parameter,"x2"))x2=atoi(search_parameter(parameter,"x2"));else	printf("can not get x2 in fun save_map_file line=%d\n",__LINE__);
-	if(search_parameter(parameter,"y2"))y2=atoi(search_parameter(parameter,"y2"));else	printf("can not get y2 in fun save_map_file line=%d\n",__LINE__);
-	if(search_parameter(parameter,"x_offset"))x_offset=atoi(search_parameter(parameter,"x_offset"));else	printf("can not get x_offset in fun save_map_file line=%d\n",__LINE__);
-	if(search_parameter(parameter,"y_offset"))y_offset=atoi(search_parameter(parameter,"y_offset"));else	printf("can not get y_offset in fun save_map_file line=%d\n",__LINE__);
+	if(search_parameter(parameter,"fun_code"))
+		fun_code=atoi(search_parameter(parameter,"fun_code"));
+	else	
+		printf("can not get fun_code in fun save_map_file line=%d\n",__LINE__);
+	
+	if(search_parameter(parameter,"x1"))
+		x1=atoi(search_parameter(parameter,"x1"));
+	else	
+		printf("can not get x1 in fun save_map_file line=%d\n",__LINE__);
+	
+	if(search_parameter(parameter,"y1"))
+		y1=atoi(search_parameter(parameter,"y1"));
+	else	
+		printf("can not get y1 in fun save_map_file line=%d\n",__LINE__);
+	
+	if(search_parameter(parameter,"x2"))
+		x2=atoi(search_parameter(parameter,"x2"));
+	else	
+		printf("can not get x2 in fun save_map_file line=%d\n",__LINE__);
+	
+	if(search_parameter(parameter,"y2"))
+		y2=atoi(search_parameter(parameter,"y2"));
+	else	
+		printf("can not get y2 in fun save_map_file line=%d\n",__LINE__);
+	
+	if(search_parameter(parameter,"x_offset"))
+		x_offset=atoi(search_parameter(parameter,"x_offset"));
+	else	
+		printf("can not get x_offset in fun save_map_file line=%d\n",__LINE__);
+	
+	if(search_parameter(parameter,"y_offset"))
+		y_offset=atoi(search_parameter(parameter,"y_offset"));
+	else	
+		printf("can not get y_offset in fun save_map_file line=%d\n",__LINE__);
+	
 	//printf("x1=%d y1=%d x2=%d y2=%d\n",x1,y1,x2,y2);
 	FILE *fp= NULL;
 	fp = fopen(map_file_csv_path,"r");
-    if(!fp){
+    if(!fp)
+	{
         sprintf(unit_data,"{\"status\":\"EMPTY MAP\"}"); 
 		strcat(total_data,unit_data);   
         return 0;
@@ -695,17 +844,20 @@ int CThread_web::save_map_file(char parameter[][64]){
     fp=NULL;
     
     //画点
-	if(fun_code==1){
+	if(fun_code==1)
+	{
 		snake_map_point[y1+y_offset][x1+x_offset].status=0x93;
 	}
 	//画细线
-	if(fun_code==2){
+	if(fun_code==2)
+	{
 		snake_map_point[y1+y_offset][x1+x_offset].status=0x93;
 		snake_map_point[y2+y_offset][x2+x_offset].status=0x93;
 		draw_small_line(x1,y1,x2,y2,x_offset,y_offset);
 	}
 	//画粗线
-	if(fun_code==3){
+	if(fun_code==3)
+	{
 		snake_map_point[y1+y_offset][x1+x_offset].status=0x93;
 		snake_map_point[y2+y_offset][x2+x_offset].status=0x93;
 		draw_small_line(x1,y1,x2,y2,x_offset,y_offset);
@@ -713,7 +865,8 @@ int CThread_web::save_map_file(char parameter[][64]){
 			    			
 	}
 	//画矩形
-	if(fun_code==4){
+	if(fun_code==4)
+	{
 		snake_map_point[y1+y_offset][x1+x_offset].status=0x93;
 		snake_map_point[y2+y_offset][x2+x_offset].status=0x93;
 		draw_fang(x1,y1,x2,y2,x_offset,y_offset);
@@ -721,15 +874,19 @@ int CThread_web::save_map_file(char parameter[][64]){
 	}
 	
 	//清除点
-	if(fun_code==5){
+	if(fun_code==5)
+	{
 		snake_map_point[y1+y_offset][x1+x_offset].status=0x00;
 	}
 	
 	//清除矩形
-	if(fun_code==6){
+	if(fun_code==6)
+	{
 		int j=0;
-		for(i=0;i<x2-x1+1;++i){
-			for(j=0;j<y1-y2+1;++j){
+		for(i=0;i<x2-x1+1;++i)
+		{
+			for(j=0;j<y1-y2+1;++j)
+			{
 				snake_map_point[y1+y_offset-j][x1+x_offset+i].status=0x00;
 			}	
 		}
@@ -737,7 +894,8 @@ int CThread_web::save_map_file(char parameter[][64]){
 	
 	//保存
 	fp = fopen(map_file_csv_path, "w");
-	if(!fp){
+	if(!fp)
+	{
         sprintf(unit_data,"{\"status\":\"SAVE ERR\"}"); 
 		strcat(total_data,unit_data);   
         return 0;
@@ -758,19 +916,29 @@ int CThread_web::make_json_dir()
 	struct dirent  *ent;
     sprintf(path,"/tmp/data/json");
 	pDir=opendir(path);
-    if(pDir  == NULL){
+    if(pDir  == NULL)
+	{
     	DIR *pDir_tmp=opendir("/tmp/data");
-		if(pDir_tmp){
+		if(pDir_tmp)
+		{
 			mkdir(path,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
 			closedir(pDir_tmp);
-		}else{
+		}
+		else
+		{	
+			//文件地址及权限
 			mkdir("/tmp/data",S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH); 
 			mkdir(path,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);  
 		}
-    }else{
-		while((ent=readdir(pDir))){
-	        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)continue; 
-	        if(ent->d_type ==8){
+    }
+	else
+	{
+		while((ent=readdir(pDir)))
+		{
+	        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)
+				continue; 
+	        if(ent->d_type ==8)
+			{
 	        	char rm_cmmond[32]={0};
 	        	sprintf(rm_cmmond,"/tmp/data/json/%s",ent->d_name);
 	        	remove(rm_cmmond);
@@ -782,16 +950,15 @@ int CThread_web::make_json_dir()
 }
 
 
-
-
-
-
+//画点
 int CThread_web::draw_one_point(int x1,int y1)
 {
 	int i=0;
 	int j=0;
-	for(i=0;i<5;++i){
-		for(j=0;j<5;++j){
+	for(i=0;i<5;++i)
+	{
+		for(j=0;j<5;++j)
+		{
 			(snake_map_point[y1+j-2][x1+i-2].status&=0xF0)|=0x0E;
 		}
 	}
@@ -802,21 +969,39 @@ int CThread_web::draw_one_point(int x1,int y1)
 int CThread_web::draw_route_in_snake(char parameter[][64])
 {
 	char unit_data[256]={0};
-	int PA_x=0;int PA_y=0;int PB_x=0;int PB_y=0;
-	if(search_parameter(parameter,"PA_x"))PA_x=atoi(search_parameter(parameter,"PA_x"));else	printf("can not get PA_x in fun draw_route_in_snake line=%d\n",__LINE__);
-	if(search_parameter(parameter,"PA_y"))PA_y=atoi(search_parameter(parameter,"PA_y"));else	printf("can not get PA_y in fun draw_route_in_snake line=%d\n",__LINE__);
-	if(search_parameter(parameter,"PB_x"))PB_x=atoi(search_parameter(parameter,"PB_x"));else	printf("can not get PB_x in fun draw_route_in_snake line=%d\n",__LINE__);
-	if(search_parameter(parameter,"PB_y"))PB_y=atoi(search_parameter(parameter,"PB_y"));else	printf("can not get PB_y in fun draw_route_in_snake line=%d\n",__LINE__);
+	int PA_x=0;
+	int PA_y=0;
+	int PB_x=0;
+	int PB_y=0;
+	if(search_parameter(parameter,"PA_x"))
+		PA_x=atoi(search_parameter(parameter,"PA_x"));
+	else	
+		printf("can not get PA_x in fun draw_route_in_snake line=%d\n",__LINE__);
+	if(search_parameter(parameter,"PA_y"))
+		PA_y=atoi(search_parameter(parameter,"PA_y"));
+	else	
+		printf("can not get PA_y in fun draw_route_in_snake line=%d\n",__LINE__);
+	if(search_parameter(parameter,"PB_x"))
+		PB_x=atoi(search_parameter(parameter,"PB_x"));
+	else	
+		printf("can not get PB_x in fun draw_route_in_snake line=%d\n",__LINE__);
+	if(search_parameter(parameter,"PB_y"))
+		PB_y=atoi(search_parameter(parameter,"PB_y"));
+	else	
+		printf("can not get PB_y in fun draw_route_in_snake line=%d\n",__LINE__);
+	
 	printf("target:Ax=%d	Ay=%d	Bx=%d	By=%d\n",PA_x,PA_y,PB_x,PB_y);
 	//加载地图
 	FILE *fp= NULL;
 	fp = fopen(map_file_csv_path,"r");
-    if(!fp){
+    if(!fp)
+	{
         sprintf(unit_data,"{\"status\":\"EMPTY MAP\"}"); 
 		strcat(total_data,unit_data);   
         return 0;
     }
     memset(snake_map_point,0,sizeof(snake_map_point));
+	
     int i=0;
     for(i=0;i<1024;++i)
     	fread(&snake_map_point[i][0],sizeof(uint32_t),1024,fp);
@@ -853,23 +1038,26 @@ int CThread_web::draw_route_in_snake(char parameter[][64])
 
 
 	int store_len_left=draw_step2->get_line_left(store_line_left);
-	for(i=0;i<store_len_left;++i){
+	for(i=0;i<store_len_left;++i)
+	{
 		(snake_map_point[store_line_left[i].y][store_line_left[i].x].status&=0xF0)|=0x0E;
 	}
 	
 	int store_len_right=draw_step2->get_line_right(store_line_right);
 	printf("store_len_right=%d  left=%d\n",store_len_right,store_len_left);
 	
-	for(i=0;i<store_len_right;++i){
+	for(i=0;i<store_len_right;++i)
+	{
 		(snake_map_point[store_line_right[i].y][store_line_right[i].x].status&=0xF0)|=0x0E;
 	}
 	
-//	//画A和B
+	//画A和B
 	draw_one_point(PA_x,PA_y);
 	draw_one_point(PB_x,PB_y);
 	//int store_len=draw_step1.get_line(store_line);
 	int store_len=draw_step1->get_first_line(store_line);
-	for(i=0;i<store_len;++i){
+	for(i=0;i<store_len;++i)
+	{
 		//printf("store:x=%d y=%d\n",store_line[i].y,store_line[i].x);
 		(snake_map_point[store_line[i].y][store_line[i].x].status&=0xF0)|=0x0E;
 	}
@@ -880,7 +1068,8 @@ int CThread_web::draw_route_in_snake(char parameter[][64])
 	//printf("first x=%d y=%d dis=%d\n",first_point.x,first_point.y,first_point.dis);
 	
 	fp = fopen(map_file_csv_path, "w");
-	if(!fp){
+	if(!fp)
+	{
         printf("write  file error in fun draw_route_in_snake\n");
         strcat(total_data,"1"); 
         return -1;
@@ -914,7 +1103,8 @@ int CThread_web::init_debug_map(char parameter[][64])
     char file_path[32]={0};
 	FILE *fp_map= NULL;
 	fp_map = fopen("/tmp/data/debug_test.csv","r");
-    if(!fp_map){
+    if(!fp_map)
+	{
         printf("read debug_test file error line = %d\n",__LINE__);   
         sprintf(unit_data,"{\"status\":\"err1\"}");
 		strcat(total_data,unit_data);   
@@ -924,7 +1114,8 @@ int CThread_web::init_debug_map(char parameter[][64])
     FILE *fp = NULL;
     sprintf(file_path,"/tmp/data/json/debug%d.json",file_id);
 	fp = fopen(file_path, "w");
-	if(!fp){
+	if(!fp)
+	{
         printf("write debug.json file error line=%d\n",__LINE__);   
         sprintf(unit_data,"{\"status\":\"err2\"}");
 		strcat(total_data,unit_data);   
@@ -940,24 +1131,31 @@ int CThread_web::init_debug_map(char parameter[][64])
 	int now_y=0;
 	int now_status=0;
 	
-	while(fgets(tempRead, sizeof(tempRead), fp_map)) {
+	while(fgets(tempRead, sizeof(tempRead), fp_map)) 
+	{
         while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
         	tempRead[strlen(tempRead) - 1] = '\0';
-        if(tempRead[0] == '\0') {
+        if(tempRead[0] == '\0') 
+		{
             continue;
         }
         ++total_point_count;
-        sscanf(tempRead, "%s%s%s%s%s%s%s%s%s%s%s%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3],tempRow[4],tempRow[5],tempRow[6],tempRow[7],tempRow[8],tempRow[9],tempRow[10],tempRow[11]);
+        sscanf(tempRead, "%s%s%s%s%s%s%s%s%s%s%s%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3],
+		tempRow[4],tempRow[5],tempRow[6],tempRow[7],tempRow[8],tempRow[9],tempRow[10],tempRow[11]);
         
-		if(total_point_count==1){
+		if(total_point_count==1)
+		{
 			++effective_point_count;
 			sprintf(val,"{\"Results\":[{\"val\":\"%d$%d$%d\"}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[4]));
 			fputs(val,fp);
 			pre_x=atoi(tempRow[1]);
 			pre_y=atoi(tempRow[2]);
 			pre_status=atoi(tempRow[4]);
-		}else{
-			if(0==effective_point_count%1000){
+		}
+		else
+		{
+			if(0==effective_point_count%1000)
+			{
 				++effective_point_count;
 				sprintf(val,",{\"val\":\"%d$%d$%d\"}]}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[4]));
 				fputs(val,fp);	
@@ -965,7 +1163,8 @@ int CThread_web::init_debug_map(char parameter[][64])
 				fp=NULL;
 				sprintf(file_path,"/tmp/data/json/debug%d.json",++file_id);
 				fp = fopen(file_path, "w");
-				if(!fp){
+				if(!fp)
+				{
 			        printf("write debug.json file error\n");   
 			        sprintf(unit_data,"{\"status\":\"err3\"}");
 					strcat(total_data,unit_data);   
@@ -976,13 +1175,18 @@ int CThread_web::init_debug_map(char parameter[][64])
 				pre_x=atoi(tempRow[1]);
 				pre_y=atoi(tempRow[2]);
 				pre_status=atoi(tempRow[4]);
-			}else{
+			}
+			else
+			{
 				now_x=atoi(tempRow[1]);
 				now_y=atoi(tempRow[2]);
 				now_status=atoi(tempRow[4]);
-				if(now_x==pre_x&&now_y==pre_y&&pre_status==now_status){
+				if(now_x==pre_x&&now_y==pre_y&&pre_status==now_status)
+				{
 					;
-				}else{
+				}
+				else
+				{
 					++effective_point_count;
 					sprintf(val,",{\"val\":\"%d$%d$%d\"}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[4]));
 					fputs(val,fp);	
@@ -993,13 +1197,16 @@ int CThread_web::init_debug_map(char parameter[][64])
 			}
 		}
     }
-    if(0==total_point_count){
+    if(0==total_point_count)
+	{
     	sprintf(val,"{\"Results\":[{\"val\":\"null\"}]}");
     	fputs(val,fp);	
     	fclose(fp);
     	strcat(total_data,"{\"status\":\"null\"}");
     	return 0; 
-	}else{
+	}
+	else
+	{
     	sprintf(val,",{\"val\":\"%d$%d$%d\"}]}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[4]));
 	}
 	fputs(val,fp);	
@@ -1033,7 +1240,8 @@ int CThread_web::init_map_file(char parameter[][64])
     char file_path[32]={0};
     FILE *fp_map = NULL;
 	fp_map = fopen("/tmp/data/map_points.csv", "r");
-    if(!fp_map){
+    if(!fp_map)
+	{
         printf("read map_points file error\n");   
         sprintf(unit_data,"{\"status\":\"err1\"}");
 		strcat(total_data,unit_data);   
@@ -1043,7 +1251,8 @@ int CThread_web::init_map_file(char parameter[][64])
     FILE *fp = NULL;
     sprintf(file_path,"/tmp/data/json/map%d.json",file_id);
 	fp = fopen(file_path, "w");
-	if(!fp){
+	if(!fp)
+	{
         printf("write map.json file error\n");   
         sprintf(unit_data,"{\"status\":\"err2\"}");
 		strcat(total_data,unit_data);   
@@ -1057,25 +1266,32 @@ int CThread_web::init_map_file(char parameter[][64])
 	int now_y=0;
 	int dis_xy=0;
     
-	while(fgets(tempRead, sizeof(tempRead), fp_map)) {
+	while(fgets(tempRead, sizeof(tempRead), fp_map)) 
+	{
         while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
         	tempRead[strlen(tempRead) - 1] = '\0';
-        if(tempRead[0] == '\0') {
+        if(tempRead[0] == '\0') 
+		{
             continue;
         }
         ++total_point_count;
         sscanf(tempRead, "%s%s%s%s%s%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3],tempRow[4],tempRow[5]);
-        if(0==strcmp(tempRow[4],"00000000000000000")){
+        if(0==strcmp(tempRow[4],"00000000000000000"))
+		{
         	strcpy(tempRow[4],"n");	
         }
-		if(total_point_count==1){
+		if(total_point_count==1)
+		{
 			++effective_point_count;
 			sprintf(val,"{\"Results\":[{\"val\":\"%d$%d$%d$%s$%d\"}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[3]),tempRow[4],atoi(tempRow[5]));
 			fputs(val,fp);
 			pre_x=atoi(tempRow[1]);
 			pre_y=atoi(tempRow[2]);
-		}else{
-			if(0==effective_point_count%1000){
+		}
+		else
+		{
+			if(0==effective_point_count%1000)
+			{
 				++effective_point_count;
 				sprintf(val,",{\"val\":\"%d$%d$%d$%s$%d\"}]}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[3]),tempRow[4],atoi(tempRow[5]));
 				fputs(val,fp);	
@@ -1083,7 +1299,8 @@ int CThread_web::init_map_file(char parameter[][64])
 				fp=NULL;
 				sprintf(file_path,"/tmp/data/json/map%d.json",++file_id);
 				fp = fopen(file_path, "w");
-				if(!fp){
+				if(!fp)
+				{
 			        printf("write map.json file error\n");   
 			        sprintf(unit_data,"{\"status\":\"err3\"}");
 					strcat(total_data,unit_data);   
@@ -1093,11 +1310,14 @@ int CThread_web::init_map_file(char parameter[][64])
 				fputs(val,fp);
 				pre_x=atoi(tempRow[1]);
 				pre_y=atoi(tempRow[2]);
-			}else{
+			}
+			else
+			{
 				now_x=atoi(tempRow[1]);
 				now_y=atoi(tempRow[2]);
 				dis_xy=sqrt((now_x-pre_x)*(now_x-pre_x)+(now_y-pre_y)*(now_y-pre_y));
-				if(dis_xy>1){
+				if(dis_xy>1)
+				{
 					++effective_point_count;
 					sprintf(val,",{\"val\":\"%d$%d$%d$%s$%d\"}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[3]),tempRow[4],atoi(tempRow[5]));
 					fputs(val,fp);	
@@ -1107,9 +1327,12 @@ int CThread_web::init_map_file(char parameter[][64])
 			}
 		}
     }
-    if(0==total_point_count){
+    if(0==total_point_count)
+	{
     	sprintf(val,"{\"Results\":[{\"val\":\"%d$%d$%d$%s$%d\"}]}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[3]),tempRow[4],atoi(tempRow[5]));
-	}else{
+	}
+	else
+	{
     	sprintf(val,",{\"val\":\"%d$%d$%d$%s$%d\"}]}",atoi(tempRow[1]),atoi(tempRow[2]),atoi(tempRow[3]),tempRow[4],atoi(tempRow[5]));
 	}
 	fputs(val,fp);	
@@ -1118,9 +1341,12 @@ int CThread_web::init_map_file(char parameter[][64])
     long fp_map_offset = ftell(fp_map);
     fclose(fp_map);
     char get_result[256]={0};
-    if(-1==caculate(get_result)){
+    if(-1==caculate(get_result))
+	{
     	sprintf(unit_data,"{\"status\":\"err4\",\"file_num\":\"%d\",\"fp_map_offset\":\"%ld\"}",file_num,fp_map_offset);
-    }else{
+    }
+	else
+	{
     	sprintf(unit_data,"{\"status\":\"ok\",\"file_num\":\"%d\",\"fp_map_offset\":\"%ld\"%s}",file_num,fp_map_offset,get_result);
 	}
     strcat(total_data,unit_data); 
@@ -1128,46 +1354,67 @@ int CThread_web::init_map_file(char parameter[][64])
 	return 0;	
 }
 
-
+//控制creater行走：前后左右停
 int CThread_web::ctrl_cleanner_robot(char parameter[][64])
 {
-	if(search_parameter(parameter,"ctrl_mode")){
+	if(search_parameter(parameter,"ctrl_mode"))
+	{
 		ctrl_mode = atoi(search_parameter(parameter,"ctrl_mode"));
-	}else{
+	}
+	else
+	{
 		printf("can not get parameter ctrl_mode in fun ctrl_cleanner_robot line=%d\n",__LINE__);
 	}
 	
-	if(search_parameter(parameter,"which_robot")){
+	if(search_parameter(parameter,"which_robot"))
+	{
 		which_robot = atoi(search_parameter(parameter,"which_robot"));
-	}else{
+	}
+	else
+	{
 		printf("can not get parameter which_robot in fun ctrl_cleanner_robot line=%d\n",__LINE__);
 	}
 	
-	if(search_parameter(parameter,"line_speed")){
+	if(search_parameter(parameter,"line_speed"))
+	{
 		line_speed = atoi(search_parameter(parameter,"line_speed"));
-	}else{
+	}
+	else
+	{
 		printf("can not get parameter Line in fun ctrl_cleanner_robot line=%d\n",__LINE__);
 	}
 	 
-	if(ctrl_mode==10){
-		if(search_parameter(parameter,"goto_x")){
+	if(ctrl_mode==10)
+	{
+		if(search_parameter(parameter,"goto_x"))
+		{
 			goto_x = atoi(search_parameter(parameter,"goto_x"));
-		}else{
+		}
+		else
+		{
 			printf("can not get parameter goto_x in fun ctrl_cleanner_robot line=%d\n",__LINE__);
 		}
-		if(search_parameter(parameter,"goto_y")){
+		if(search_parameter(parameter,"goto_y"))
+		{
 			goto_y = atoi(search_parameter(parameter,"goto_y"));
-		}else{
+		}
+		else
+		{
 			printf("can not get parameter goto_y in fun ctrl_cleanner_robot line=%d\n",__LINE__);
 		}
 		printf("ctrl_mode = %d	line_speed = %d	goto_x = %d	goto_y = %d	which_robot=%d\n",ctrl_mode,line_speed,goto_x,goto_y,which_robot);
 		web_ctrl_info.goto_x=goto_x;
 		web_ctrl_info.goto_y=goto_y;
 		
-	}else{
-		if(search_parameter(parameter,"radius")){
+	}
+	else
+	{
+		if(search_parameter(parameter,"radius"))
+		{
 			radius = atoi(search_parameter(parameter,"radius"));
-		}else{
+		}
+		else
+		{
 			printf("can not get parameter angv in fun ctrl_cleanner_robot line=%d\n",__LINE__);
 		}
 		printf("ctrl_mode = %d	line_speed = %d	radius = %d	which_robot=%d\n",ctrl_mode,line_speed,radius,which_robot);
@@ -1180,6 +1427,8 @@ int CThread_web::ctrl_cleanner_robot(char parameter[][64])
 	strcat(total_data,"{\"status\":\"ok\"}"); 	
 	return 0;
 }
+
+//显示slam栅格图
 int CThread_web::add_slam_point(char parameter[][64])
 {
 	
@@ -1195,30 +1444,42 @@ int CThread_web::add_slam_point(char parameter[][64])
 	memset(tempRead,0,sizeof(tempRead));
 	memset(tempRow,0,sizeof(tempRow));
 	memset(unit_data,0,sizeof(unit_data)); 
-	if(search_parameter(parameter,"Hz"))Hz=atoi(search_parameter(parameter,"Hz"));else	printf("can not get Hz in fun add_slam_point line=%d\n",__LINE__);
-	if(search_parameter(parameter,"fp_map_offset"))fp_map_offset=atol(search_parameter(parameter,"fp_map_offset"));else	printf("can not get fp_map_offset in fun add_slam_point line=%d\n",__LINE__);
+	if(search_parameter(parameter,"Hz"))
+		Hz=atoi(search_parameter(parameter,"Hz"));
+	else	
+		printf("can not get Hz in fun add_slam_point line=%d\n",__LINE__);
+	if(search_parameter(parameter,"fp_map_offset"))
+		fp_map_offset=atol(search_parameter(parameter,"fp_map_offset"));
+	else	
+		printf("can not get fp_map_offset in fun add_slam_point line=%d\n",__LINE__);
 	int action=0;
 	int mode=0;
 	int step=0;
 	FILE *fp = NULL;
 	fp = fopen("/tmp/data/map_points.csv", "r");
-   	if(!fp){
+   	if(!fp)
+	{
 		printf("read  map_points error, line = %d\n",__LINE__);
         sprintf(unit_data,"{\"status\":\"%d\"}",-2);
         strcat(total_data,unit_data);   
         return -1;
     }
+	//把fp有关的文件位置指针放到一个指定位置
+	//将指针从文件末向前移动len(fp_map_offset)个位置
     fseek(fp,fp_map_offset,SEEK_SET);
-	while(fgets(tempRead, sizeof(tempRead), fp)) {
+	while(fgets(tempRead, sizeof(tempRead), fp)) 
+	{
         while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
-        	tempRead[strlen(tempRead) - 1] = '\0';
-        if(tempRead[0] == '\0') {
+        	tempRead[strlen(tempRead) - 1] = '\0';//
+        if(tempRead[0] == '\0') 
+		{
             continue;
         }
 		++i;
 		//															No		x			y			theta	block		status		action		mode		step
  		sscanf(tempRead, "%s	%s	%s	%s	%s %s	%s	%s	%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3],tempRow[4], tempRow[5],tempRow[6],tempRow[7], tempRow[8]);
-        if(0==strcmp(tempRow[4],"00000000000000000")){
+        if(0==strcmp(tempRow[4],"00000000000000000"))
+		{
         	strcpy(tempRow[4],"n");	
         }
 		
@@ -1238,15 +1499,20 @@ int CThread_web::add_slam_point(char parameter[][64])
 			strcat(total_data,unit_data);
 			fp_offset_pre=fp_offset_now;
 			fp_offset_now= ftell(fp);
-		}else{
+		}
+		else
+		{
 			break;	
 		}
 		
 	}
 	fclose(fp);
-	if(i!=1&&i!=2&&fp_offset_pre!=0){
+	if(i!=1&&i!=2&&fp_offset_pre!=0)
+	{
 		fp_map_offset=fp_offset_pre;
-	}else{
+	}
+	else
+	{
 		sprintf(unit_data,"{\"status\":\"%d\"}",-3);
 		strcat(total_data,unit_data);
 		return 0;
@@ -1266,6 +1532,7 @@ int CThread_web::add_slam_point(char parameter[][64])
 	return 0;	
 }
 
+//显示调试地图
 int CThread_web::add_debug_point(char parameter[][64])
 {
 	int i=0;
@@ -1280,26 +1547,35 @@ int CThread_web::add_debug_point(char parameter[][64])
 	memset(tempRead,0,sizeof(tempRead));
 	memset(tempRow,0,sizeof(tempRow));
 	memset(unit_data,0,sizeof(unit_data)); 
-	if(search_parameter(parameter,"Hz"))Hz=atoi(search_parameter(parameter,"Hz"));else	printf("can not get Hz in fun add_debug_point line=%d\n",__LINE__);
-	if(search_parameter(parameter,"fp_map_offset"))fp_map_offset=atol(search_parameter(parameter,"fp_map_offset"));else	printf("can not get fp_map_offset in fun add_debug_point line=%d\n",__LINE__);
+	if(search_parameter(parameter,"Hz"))
+		Hz=atoi(search_parameter(parameter,"Hz"));
+	else	
+		printf("can not get Hz in fun add_debug_point line=%d\n",__LINE__);
+	if(search_parameter(parameter,"fp_map_offset"))
+		fp_map_offset=atol(search_parameter(parameter,"fp_map_offset"));
+	else	
+		printf("can not get fp_map_offset in fun add_debug_point line=%d\n",__LINE__);
 	
 	FILE *fp = NULL;
 	fp = fopen("/tmp/data/debug_test.csv", "r");
-   	if(!fp){
+   	if(!fp)
+	{
 		printf("read  debug_test error, line = %d\n",__LINE__);
         sprintf(unit_data,"{\"status\":\"%d\"}",-2);
         strcat(total_data,unit_data);   
         return -1;
     }
     fseek(fp,fp_map_offset,SEEK_SET);
-	while(fgets(tempRead, sizeof(tempRead), fp)) {
+	while(fgets(tempRead, sizeof(tempRead), fp)) 
+	{
         while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
         	tempRead[strlen(tempRead) - 1] = '\0';
-        if(tempRead[0] == '\0') {
+        if(tempRead[0] == '\0') 
+		{
             continue;
         }
 		++i;
-		//  1   2   3    4         5        6       7      8     9    10   11    12
+		//1   2   3    4         5        6       7      8     9    10   11    12
 		//index	x	y	theta	status	bump+drop wall01 wall02 ir01 ir02 ir03 stamp
  		sscanf(tempRead, "%s%s%s%s%s%s%s%s%s%s%s%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3],tempRow[4],tempRow[5],tempRow[6],tempRow[7],tempRow[8],tempRow[9],tempRow[10],tempRow[11]);
         
@@ -1313,23 +1589,31 @@ int CThread_web::add_debug_point(char parameter[][64])
 		else if(i<=Hz)
 		{
 			sprintf(val,"%d$%d$%.1f$%d",atoi(tempRow[1]),atoi(tempRow[2]),atof(tempRow[3]),atoi(tempRow[4]));
-			if(i%5==1){
+			if(i%5==1)
+			{
 				sprintf(unit_data,",{\"val\":\"%s\",\"bus\":\"%s$%d$%d$%d$%d$%d\"}",val,tempRow[5],atoi(tempRow[6]),atoi(tempRow[7]),atoi(tempRow[8]),atoi(tempRow[9]),atoi(tempRow[10]));
-			}else{
+			}
+			else
+			{
 				sprintf(unit_data,",{\"val\":\"%s\",\"bus\":\"null\"}",val);
 			}
 			strcat(total_data,unit_data);
 			fp_offset_pre=fp_offset_now;
 			fp_offset_now= ftell(fp);
-		}else{
+		}
+		else
+		{
 			break;	
 		}
 		
 	}
 	fclose(fp);
-	if(i!=1&&i!=2&&fp_offset_pre!=0){
+	if(i!=1&&i!=2&&fp_offset_pre!=0)
+	{
 		fp_map_offset=fp_offset_pre;
-	}else{
+	}
+	else
+	{
 		sprintf(unit_data,"{\"status\":\"%d\"}",-3);
 		strcat(total_data,unit_data);
 		return 0;
@@ -1361,7 +1645,10 @@ int CThread_web::show_door(char parameter[][64])
 	memset(tempRead,0,sizeof(tempRead));
 	memset(tempRow,0,sizeof(tempRow));
 	memset(unit_data,0,sizeof(unit_data)); 
-	if(search_parameter(parameter,"fp_item_offset"))fp_item_offset=atol(search_parameter(parameter,"fp_item_offset"));else	printf("can not get fp_item_offset in fun add_slam_point line=%d\n",__LINE__);
+	if(search_parameter(parameter,"fp_item_offset"))
+		fp_item_offset=atol(search_parameter(parameter,"fp_item_offset"));
+	else	
+		printf("can not get fp_item_offset in fun add_slam_point line=%d\n",__LINE__);
 	FILE *fp = NULL;
 	fp = fopen("/tmp/data/door.csv", "r");
    	if(!fp){
@@ -1448,10 +1735,12 @@ int CThread_web::show_red_led(char parameter[][64])
 	char tempRead[128];
 	memset(tempRead,0,sizeof(tempRead));
 	memset(tempRow,0,sizeof(tempRow));
-	while(fgets(tempRead, sizeof(tempRead), fp_r)) {
+	while(fgets(tempRead, sizeof(tempRead), fp_r)) 
+	{
         while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
         	tempRead[strlen(tempRead) - 1] = '\0';
-        if(tempRead[0] == '\0') {
+        if(tempRead[0] == '\0') 
+		{
             continue;
         }
     	sscanf(tempRead, "%s%s%s%s%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3],tempRow[4]);
@@ -1466,7 +1755,8 @@ int CThread_web::show_red_led(char parameter[][64])
 	fp_w=NULL;
 	
 	fp_r = fopen("led_points.csv","r");
-    if(!fp_r){
+    if(!fp_r)
+	{
         printf("read led_points.csv  error\n"); 
         sprintf(unit_data,"{\"status\":\"led_points.csv not exist!\"}"); 
 		strcat(total_data,unit_data);   
@@ -1474,7 +1764,8 @@ int CThread_web::show_red_led(char parameter[][64])
     }
     
     fp_w = fopen("/tmp/data/json/led_points.json","w");
-	if(!fp_w){
+	if(!fp_w)
+	{
         printf("write led_points.json file error\n");
         sprintf(unit_data,"{\"status\":\"err2\"}");
 		strcat(total_data,unit_data);   
@@ -1485,10 +1776,12 @@ int CThread_web::show_red_led(char parameter[][64])
     
 	memset(tempRead,0,sizeof(tempRead));
 	memset(tempRow,0,sizeof(tempRow));
-	while(fgets(tempRead, sizeof(tempRead), fp_r)) {
+	while(fgets(tempRead, sizeof(tempRead), fp_r)) 
+	{
         while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
         	tempRead[strlen(tempRead) - 1] = '\0';
-        if(tempRead[0] == '\0') {
+        if(tempRead[0] == '\0') 
+		{
             continue;
         }
     	sscanf(tempRead, "%s%s%s%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3]);
@@ -1500,16 +1793,13 @@ int CThread_web::show_red_led(char parameter[][64])
 	fclose(fp_r);
 	fclose(fp_w);
 	
-	
-	
 	sprintf(unit_data,"{\"status\":\"ok\"}");
 	strcat(total_data,unit_data); 
-	
-	
-	
-	
+		
 	return 0;	
 }
+
+//获取图片地址
 int CThread_web::get_jpg_path(char *jpg_name,char*out_path)
 {
 	int max=0;
@@ -1522,21 +1812,29 @@ int CThread_web::get_jpg_path(char *jpg_name,char*out_path)
     pDir=opendir(path);
     if(pDir  == NULL){
 		DIR *pDir_tmp=opendir("/tmp/data");
-		if(pDir_tmp){
+		if(pDir_tmp)
+		{
 			mkdir(path,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
 			closedir(pDir_tmp);   
-		}else{
+		}
+		else
+		{
      		mkdir("/tmp/data",S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH); 
      		mkdir(path,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);  
      	}
          pDir=opendir(path);
     }
-    while((ent=readdir(pDir))){
-        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)continue; 
-        if(ent->d_type ==8){
-        	if(ent->d_name[0]=='r'&&ent->d_name[1]=='e')continue;
+    while((ent=readdir(pDir)))
+	{
+        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)
+			continue; 
+        if(ent->d_type ==8)
+		{
+        	if(ent->d_name[0]=='r'&&ent->d_name[1]=='e')
+				continue;
             sprintf(id,"%c%c%c%c%c",ent->d_name[5],ent->d_name[6],ent->d_name[7],ent->d_name[8],ent->d_name[9]);
-            if(atoi(id)>max){
+            if(atoi(id)>max)
+			{
         		max=atoi(id);
         		sprintf(jpg_name,"%s",ent->d_name);
             }
@@ -1546,7 +1844,10 @@ int CThread_web::get_jpg_path(char *jpg_name,char*out_path)
     closedir(pDir);
 	return  max;
 }
-int CThread_web::remove_some_jpg_file(const char *path){
+
+//删除图片
+int CThread_web::remove_some_jpg_file(const char *path)
+{
 	int	i=0;
 	char id[32]={0};
 	char remove_path[64]={0};
@@ -1555,17 +1856,23 @@ int CThread_web::remove_some_jpg_file(const char *path){
 	DIR *pDir;
 	struct dirent  *ent;
     pDir=opendir(path);
-    if(pDir  == NULL){
+    if(pDir  == NULL)
+	{
 		return 0;
 	}
-    while((ent=readdir(pDir))){
-        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)continue; 
-        if(ent->d_type ==8){
-        	if(ent->d_name[0]=='r'&&ent->d_name[1]=='e')continue;
+    while((ent=readdir(pDir)))
+	{
+        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)
+			continue; 
+        if(ent->d_type == 8)
+		{
+        	if(ent->d_name[0]=='r'&&ent->d_name[1]=='e')
+				continue;
             sprintf(id,"%c%c%c%c%c",ent->d_name[5],ent->d_name[6],ent->d_name[7],ent->d_name[8],ent->d_name[9]);
             store[i].id=atoi(id);
             strcpy(store[i].jpg,ent->d_name);
-            if(++i>250){
+            if(++i>250)
+			{
         		break;
             }
         }
@@ -1576,7 +1883,8 @@ int CThread_web::remove_some_jpg_file(const char *path){
     qsort(store,i,sizeof(remove_jpg_pkg),asc_jpg_file);
     
 	int dele_i=i-15;
-	for(i=0;i<dele_i;++i){
+	for(i=0;i<dele_i;++i)
+	{
 		sprintf(remove_path,"%s/%s",path,store[i].jpg);
 		remove(remove_path);
 	}
@@ -1584,7 +1892,7 @@ int CThread_web::remove_some_jpg_file(const char *path){
 }
 
 
-
+//获取图片地址
 int CThread_web::get_mapjpg_path(char *jpg_name,char*out_path)
 {
 	//remove_some_jpg_file("/tmp/data/mapjpg");
@@ -1596,23 +1904,32 @@ int CThread_web::get_mapjpg_path(char *jpg_name,char*out_path)
     sprintf(path,"/tmp/data/mapjpg");
 	strcpy(out_path,"/slampic/mapjpg");
     pDir=opendir(path);
-    if(pDir  == NULL){
+    if(pDir  == NULL)
+	{
 		DIR *pDir_tmp=opendir("/tmp/data");
-		if(pDir_tmp){
+		if(pDir_tmp)
+		{
 			mkdir(path,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
 			closedir(pDir_tmp);   
-		}else{
+		}
+		else
+		{
      		mkdir("/tmp/data",S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH); 
      		mkdir(path,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);  
      	}
          pDir=opendir(path);
     }
-    while((ent=readdir(pDir))){
-        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)continue; 
-        if(ent->d_type ==8){
-        	if(ent->d_name[0]=='r'&&ent->d_name[1]=='e')continue;
+    while((ent=readdir(pDir)))
+	{
+        if(strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)
+			continue; 
+        if(ent->d_type ==8)
+		{
+        	if(ent->d_name[0]=='r'&&ent->d_name[1]=='e')
+				continue;
             sprintf(id,"%c%c%c%c%c",ent->d_name[5],ent->d_name[6],ent->d_name[7],ent->d_name[8],ent->d_name[9]);
-            if(atoi(id)>max){
+            if(atoi(id)>max)
+			{
         		max=atoi(id);
         		sprintf(jpg_name,"%s",ent->d_name);
             }
@@ -1631,14 +1948,19 @@ int CThread_web::play_video(char parameter[][64])
 	char unit_data[128]={0};
 	get_jpg_path(jpg_name,path);
 	get_mapjpg_path(map_jpg_name,map_path);
-	if(0==strcmp(jpg_name,"")){
+	if(0==strcmp(jpg_name,""))
+	{
 		sprintf(unit_data,"{\"path\":\"null\",\"map\":\"null\"}");
-	}else{
+	}
+	else
+	{
 		sprintf(unit_data,"{\"path\":\"%s/%s\",\"map\":\"%s/%s\"}",path,jpg_name,map_path,map_jpg_name);
-	}strcat(total_data,unit_data);
+	}
+	strcat(total_data,unit_data);
 	return 0;	
 } 
 
+//计算vslam精度
 int CThread_web::calculate_point(char parameter[][64])
 {
 	int slam_x=0;
@@ -1647,28 +1969,36 @@ int CThread_web::calculate_point(char parameter[][64])
 	float theta=0.0;
 	char unit_data[256]={0};
 	char line_data[256]={0};
-	if(search_parameter(parameter,"slam_x")&&search_parameter(parameter,"slam_y")&&search_parameter(parameter,"theta")){
+	if(search_parameter(parameter,"slam_x")&&search_parameter(parameter,"slam_y")&&search_parameter(parameter,"theta"))
+	{
 		slam_x=atoi(search_parameter(parameter,"slam_x"));
 		slam_y=atoi(search_parameter(parameter,"slam_y"));
 		theta=atof(search_parameter(parameter,"theta"));
-	}else{
+	}
+	else
+	{
 		printf("can not get slam_x slam_y theta in fun calculate_point line=%d\n",__LINE__);
 		sprintf(unit_data,"{\"status\":\"err1\"}");
 		strcat(total_data,unit_data);
 	}
 	
-	if(search_parameter(parameter,"no")){
+	if(search_parameter(parameter,"no"))
+	{
 		no=atoi(search_parameter(parameter,"no"));
-	}else{
+	}
+	else
+	{
 		printf("can not get no in fun calculate_point line=%d\n",__LINE__);
 		sprintf(unit_data,"{\"status\":\"err2\"}");
 		strcat(total_data,unit_data);
 	}
 	
-	if(1==no){
+	if(1==no)
+	{
 		FILE *fp = NULL;
 	    fp = fopen("/tmp/data/calculate_point.csv", "w");
-		if(!fp){
+		if(!fp)
+		{
 	        printf("write calculate_point file error\n");   
 	        sprintf(unit_data,"{\"status\":\"err3\"}");
 			strcat(total_data,unit_data);   
@@ -1680,12 +2010,15 @@ int CThread_web::calculate_point(char parameter[][64])
 	    sprintf(unit_data,"{\"status\":\"ok\",\"dis\":\"0\"}");
 		strcat(total_data,unit_data);
 		return 0; 
-	}else{
+	}
+	else
+	{
 		int pre_x=0;
 		int pre_y=0;
 		FILE *fp = NULL;
 	    fp = fopen("/tmp/data/calculate_point.csv", "r");
-		if(!fp){
+		if(!fp)
+		{
 	        printf("read calculate_point file error\n");   
 	        sprintf(unit_data,"{\"status\":\"err4\"}");
 			strcat(total_data,unit_data);   
@@ -1695,13 +2028,16 @@ int CThread_web::calculate_point(char parameter[][64])
 		char tempRead[128];
 		memset(tempRead,0,sizeof(tempRead));
 		memset(tempRow,0,sizeof(tempRow));
-		while(fgets(tempRead, sizeof(tempRead), fp)) {
+		while(fgets(tempRead, sizeof(tempRead), fp)) 
+		{
 	        while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
 	        	tempRead[strlen(tempRead) - 1] = '\0';
-	        if(tempRead[0] == '\0') {
+	        if(tempRead[0] == '\0') 
+			{
 	            continue;
 	        }
-	        if(tempRead[0] == 'n'&&tempRead[1] == 'o') {
+	        if(tempRead[0] == 'n'&&tempRead[1] == 'o') 
+			{
 	            continue;
 	        }
         	sscanf(tempRead, "%s%s%s%s%s",tempRow[0],tempRow[1],tempRow[2],tempRow[3],tempRow[4]);
@@ -1711,7 +2047,8 @@ int CThread_web::calculate_point(char parameter[][64])
 		pre_x=atoi(tempRow[1]);
 		pre_y=atoi(tempRow[2]);
 	    fp = fopen("/tmp/data/calculate_point.csv", "a");
-		if(!fp){
+		if(!fp)
+		{
 	        printf("write calculate_point file error\n");   
 	        sprintf(unit_data,"{\"status\":\"err5\"}");
 			strcat(total_data,unit_data);   
@@ -1730,43 +2067,56 @@ int CThread_web::calculate_point(char parameter[][64])
 	
 	return 0;
 }	
+
+//获取配置文件
 int CThread_web::get_config_val(char parameter[][64])
 {
 	char unit_data[128]={0};
 	char val[128]={0};
-	if(search_parameter(parameter,"name")&&search_parameter(parameter,"path")){
-		if(-1==search_config(search_parameter(parameter,"path"),search_parameter(parameter,"name"),val)){
+	if(search_parameter(parameter,"name")&&search_parameter(parameter,"path"))
+	{
+		if(-1==search_config(search_parameter(parameter,"path"),search_parameter(parameter,"name"),val))
+		{
 			sprintf(unit_data,"{\"val\":\"null\"}");
-		}else{
+		}
+		else
+		{
 			sprintf(unit_data,"{\"val\":\"%s\"}",val);
 		}
-	}else{
-		printf("can not get parameter in fun get_config_val line=%d\n",__LINE__);
+	}
+	else
+	{
+		printf("can not get parameter in fun get_config_val line=%d\n", __LINE__);
 		sprintf(unit_data,"{\"val\":\"null\"}");
 	}
 	strcat(total_data,unit_data);
 	return 0;	
 }
 
+//停止系统
 int CThread_web::stop_web_ui_process(char parameter[][64])
 {
 	strcat(total_data,"1");
 	return 0;	
 }
 
+//解析url
 int CThread_web::decode_url(char *url,char *path)
 {
 	int tail = 0;
-	if(url[strlen(url)-3]=='%'&&url[strlen(url)-2]=='2'&&url[strlen(url)-1]=='F'){
+	if(url[strlen(url)-3]=='%'&&url[strlen(url)-2]=='2'&&url[strlen(url)-1]=='F')
+	{
     	tail=1;
     }
 	char *p;
-	if(NULL==strstr(url,"%2F")){
+	if(NULL==strstr(url,"%2F"))
+	{
 		strcpy(path,url);
 		return 0;
 	}
 	p = strtok(url,"%2F");
-	if(p){
+	if(p)
+	{
 		strcat(path,"/");
 		strcat(path,p);
 	}
@@ -1776,12 +2126,15 @@ int CThread_web::decode_url(char *url,char *path)
     	strcat(path,"/");
     	strcat(path,p);
     }
-    if(tail){
+    if(tail)
+	{
     	strcat(path,"/");	
     }
 
 	return 0;	
 }
+
+//查询配置文件
 int CThread_web::search_config(char* path,char* data,char *val)
 {
 	int i = 0;
@@ -1792,24 +2145,29 @@ int CThread_web::search_config(char* path,char* data,char *val)
 	decode_url(path,decode_path);
 	FILE *fp = NULL;
 	fp = fopen(decode_path, "r");
-   	if(!fp){
+   	if(!fp)
+	{
 		printf("read  file error path=%s\n",decode_path);
 		return -1;
     }
-	while(fgets(tempRead, sizeof(tempRead), fp)) {
+	while(fgets(tempRead, sizeof(tempRead), fp)) 
+	{
         while(tempRead[strlen(tempRead) - 1] == '\n' || tempRead[strlen(tempRead) - 1] == ' ') 
         	tempRead[strlen(tempRead) - 1] = '\0';
-        if(tempRead[0] == '\0') {
+        if(tempRead[0] == '\0') 
+		{
             continue;
         }
         p=strstr(tempRead,"=");
         *p='\0';
-        if(0==strcmp(data,tempRead)){
+        if(0==strcmp(data,tempRead))
+		{
         	strcpy(val,p+1);
         	fclose(fp);
         	return 0;
         }
-		if(++i>16){
+		if(++i>16)
+		{
 			break;	
 		}
 	} 
@@ -1845,6 +2203,7 @@ int CThread_web::get_server_ip(char*ip,const char*network_name)
         if(ifreq->ifr_flags == AF_INET){ //for ipv4
             if(0 == strcmp(network_name,ifreq->ifr_name))
             {
+				//将后面的字符串复制给前面
             	strcpy(ip ,inet_ntoa(((struct sockaddr_in*)&(ifreq->ifr_addr))->sin_addr));
             	return 0;	
         	}
@@ -1855,6 +2214,7 @@ int CThread_web::get_server_ip(char*ip,const char*network_name)
 	return 0;	
 }
 
+//建立客户套接字
 int CThread_web::creat_server_socket(char*ip,int port)
 {
 	int server_socket = 0;	
@@ -1887,7 +2247,8 @@ int CThread_web::creat_server_socket(char*ip,int port)
 	if(retval ==-1)
 	{
 		close(server_socket);
-		while(1){
+		while(1)
+		{
 			sleep(1);
 			printf("listen failed in fun creat_server_socke\n");
 		}
@@ -1896,6 +2257,7 @@ int CThread_web::creat_server_socket(char*ip,int port)
 	
 	return server_socket;	
 }
+
 
 //在二维数组中搜索字段名为data的数据
 char *CThread_web::search_parameter(char parameter[][64],const char*data)
@@ -1910,9 +2272,11 @@ char *CThread_web::search_parameter(char parameter[][64],const char*data)
 	}	
 	return NULL;
 }
+
 //解析post请求的数据data，保存到二维数组parameter
 int CThread_web::decode_post_data(char* read_buf,char parameter[][64])
 {
+	//判断后面的字符串是否是前面的子串
 	char *p = strstr(read_buf,"\r\n\r\n");
 	char *q;
 	char *a;
@@ -1920,10 +2284,11 @@ int CThread_web::decode_post_data(char* read_buf,char parameter[][64])
 	int i = 0;
 	if(p+4)
 	{
-		
+		//以&作为切割点，切割字符串
 		a = strtok(p+4,"&");
 		b = strstr(a,"=");
-		if(b&&a&&b+1){
+		if(b&&a&&b+1)
+		{
 			*b='\0';
 			strcpy(parameter[0],a);
 			strcpy(parameter[1],b+1);
@@ -1931,7 +2296,8 @@ int CThread_web::decode_post_data(char* read_buf,char parameter[][64])
 	        {
 	        	i+=2;
 	        	b = strstr(q,"=");
-	        	if(b&&q&&b+1){
+	        	if(b&&q&&b+1)
+				{
 	        		*b='\0';
 	        		strcpy(parameter[i],q);
 					strcpy(parameter[i+1],b+1);
@@ -1960,7 +2326,8 @@ int CThread_web::post_messages(char*ip,int port)
 		memset(&client_socket, 0, sizeof(struct sockaddr_in));  
 	    client_addrlen = 160;  
 		int client_fd = accept(server_socket,(struct sockaddr*)&client_socket,&client_addrlen);
-		if(client_fd==-1){
+		if(client_fd==-1)
+		{
 			printf("client_fd=-1 web over\n");
 			return 0;
 		}
@@ -1968,10 +2335,13 @@ int CThread_web::post_messages(char*ip,int port)
 		memset(parameter,0,sizeof(parameter));
 		int read_len=read(client_fd,read_buf,sizeof(read_buf));
 		printf("line=%d,read_buf=%s\n",__LINE__,read_buf);
-		if(read_len>1022){
+		if(read_len>1022)
+		{
 			printf("read:\n%s\nread>1022\n",read_buf);
 			return 0;
-		}else{
+		}
+		else
+		{
 			//printf("read:\n%s\n",read_buf);
 			decode_post_data(read_buf,parameter);
 			make_send_buf(parameter);
@@ -1979,8 +2349,10 @@ int CThread_web::post_messages(char*ip,int port)
 		printf("line=%d,send_buf=%s\n",__LINE__,send_buf);
 		write(client_fd,send_buf,strlen(send_buf));
 		close(client_fd);
-		if(search_parameter(parameter,"Fun")){
-			if(0==strcmp("stop_web_ui_process",search_parameter(parameter,"Fun"))){
+		if(search_parameter(parameter,"Fun"))
+		{
+			if(0==strcmp("stop_web_ui_process",search_parameter(parameter,"Fun")))
+			{
 				close(server_socket);
 				cout << "\n\n\nWeb was stop good by command stop_web_ui_process\n "<< endl;
 				return 0;

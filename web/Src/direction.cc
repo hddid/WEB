@@ -48,7 +48,8 @@ int Draw_line::run_this_line(int x1,int y1,int x2,int y2,int mode)
 	int i=0;
 	cut_line(x1,y1,x2,y2);
 	qsort(line,line_count,sizeof(AB_point),asc_sort_point);
-	if(mode==1){
+	if(mode==1)
+	{
 		for(i=0;i<line_count;++i){
 			if((map[line[i].y][line[i].x].status&0x0F)==0x03){//高4位有计数则遇到了障碍点
 				first_line_count=i+1;
@@ -58,10 +59,14 @@ int Draw_line::run_this_line(int x1,int y1,int x2,int y2,int mode)
 				break;
 			}
 		}
-	}else if(mode==2){
-		for(i=0;i<line_count;++i){
+	}
+	else if(mode==2)
+	{
+		for(i=0;i<line_count;++i)
+		{
 			//if(i>1){// it is important can changed
-			if(i>2){
+			if(i>2)
+			{
 				if((map[line[i].y][line[i].x].status&0x0F)==0x0E||\
 					(map[line[i].y-1][line[i].x].status&0x0F)==0x0E||\
 					(map[line[i].y-1][line[i].x+1].status&0x0F)==0x0E||\
@@ -110,7 +115,8 @@ int Draw_line::get_line(AB_point* tmp_line)
 int Draw_line::get_first_line(AB_point* tmp_line)
 {
 	int i=0;
-	for(i=0;i<first_line_count;++i){
+	for(i=0;i<first_line_count;++i)
+	{
 		memcpy(&tmp_line[i],&line[i],sizeof(AB_point));	
 	}
 	return first_line_count;
@@ -304,7 +310,8 @@ Draw_direction::Draw_direction(MapPoints snake_map_point[][1024])
 	memset(&turn_P,0,sizeof(AB_point));
 	
 	int i=0;
-	for(i=0;i<1024;++i){
+	for(i=0;i<1024;++i)
+	{
 		memcpy(&map[i],&snake_map_point[i],1024*sizeof(uint32_t));
 	}
 	
@@ -332,51 +339,77 @@ int Draw_direction::small_turn(int direction)
 	int turn_val=0;
 	if(turn_P.y>10&&turn_P.y<1012&&turn_P.x>10&&turn_P.x<1012)
 	{
-		if((map[turn_P.y-1][turn_P.x-1].status&0x0F)==0x03){
+		if((map[turn_P.y-1][turn_P.x-1].status&0x0F)==0x03)
+		{
 			turn_val+=128;
 		}
-		if((map[turn_P.y-1][turn_P.x].status&0x0F)==0x03){
+		if((map[turn_P.y-1][turn_P.x].status&0x0F)==0x03)
+		{
 			turn_val+=64;
 		}
-		if((map[turn_P.y-1][turn_P.x+1].status&0x0F)==0x03){
+		if((map[turn_P.y-1][turn_P.x+1].status&0x0F)==0x03)
+		{
 			turn_val+=32;
 		}
-		if((map[turn_P.y][turn_P.x+1].status&0x0F)==0x03){
+		if((map[turn_P.y][turn_P.x+1].status&0x0F)==0x03)
+		{
 			turn_val+=16;
 		}
-		if((map[turn_P.y+1][turn_P.x+1].status&0x0F)==0x03){
+		if((map[turn_P.y+1][turn_P.x+1].status&0x0F)==0x03)
+		{
 			turn_val+=8;
 		}
-		if((map[turn_P.y+1][turn_P.x].status&0x0F)==0x03){
+		if((map[turn_P.y+1][turn_P.x].status&0x0F)==0x03)
+		{
 			turn_val+=4;
 		}
-		if((map[turn_P.y+1][turn_P.x-1].status&0x0F)==0x03){
+		if((map[turn_P.y+1][turn_P.x-1].status&0x0F)==0x03)
+		{
 			turn_val+=2;
 		}
-		if((map[turn_P.y][turn_P.x-1].status&0x0F)==0x03){
+		if((map[turn_P.y][turn_P.x-1].status&0x0F)==0x03)
+		{
 			turn_val+=1;
 		}
-		if(direction==0){//沿着障碍画一圈（向左）
+		if(direction==0)
+		{//沿着障碍画一圈（向左）
 			
 			//printf("buf_val=%d val=%d\n",turn_val,left_direction_buf[turn_val]);
 			
-			if(1==left_direction_buf[turn_val]){
+			if(1==left_direction_buf[turn_val])
+			{
 				--turn_P.x;--turn_P.y;
-			}else if(2==left_direction_buf[turn_val]){
+			}
+			else if(2==left_direction_buf[turn_val])
+			{
 				--turn_P.y;
-			}else if(3==left_direction_buf[turn_val]){
+			}
+			else if(3==left_direction_buf[turn_val])
+			{
 				++turn_P.x;--turn_P.y;
-			}else if(4==left_direction_buf[turn_val]){
+			}
+			else if(4==left_direction_buf[turn_val])
+			{
 				++turn_P.x;
-			}else if(5==left_direction_buf[turn_val]){
+			}
+			else if(5==left_direction_buf[turn_val])
+			{
 				++turn_P.x;++turn_P.y;
-			}else if(6==left_direction_buf[turn_val]){
+			}
+			else if(6==left_direction_buf[turn_val])
+			{
 				++turn_P.y;
-			}else if(7==left_direction_buf[turn_val]){
+			}
+			else if(7==left_direction_buf[turn_val])
+			{
 				--turn_P.x;++turn_P.y;
-			}else if(8==left_direction_buf[turn_val]){
+			}
+			else if(8==left_direction_buf[turn_val])
+			{
 				--turn_P.x;
-			}else if(0==left_direction_buf[turn_val]){
+			}
+			else if(0==left_direction_buf[turn_val])
+			{
 				printf("it is end buf_val=%d val=%d px=%d py=%d\n",turn_val,left_direction_buf[turn_val],turn_P.x,turn_P.y);
 				return 0;
 			}
@@ -393,7 +426,8 @@ int Draw_direction::small_turn(int direction)
 			
 			//printf("circle_count=%d  dis=%d x=%d y=%d\n",circle_count,line_circle[circle_count].dis,line_circle[circle_count].x,line_circle[circle_count].y);
 				
-			if(circle_count>5){
+			if(circle_count>5)
+			{
 				
 				if(line_circle[circle_count].x==line_circle[0].x&&line_circle[circle_count].y==line_circle[0].y)
 				{
@@ -412,32 +446,51 @@ int Draw_direction::small_turn(int direction)
 			return 1;
 				
 		}
-		if(direction==1){
+		if(direction==1)
+		{
 			//printf("buf_val=%d val=%d\n",turn_val,left_direction_buf[turn_val]);
 			//printf("26-31  = %d %d %d %d %d\n",left_direction_buf[24],left_direction_buf[25],left_direction_buf[26],left_direction_buf[27],left_direction_buf[28]);
-			if(1==left_direction_buf[turn_val]){
+			if(1==left_direction_buf[turn_val])
+			{
 				--turn_P.x;--turn_P.y;
-			}else if(2==left_direction_buf[turn_val]){
+			}
+			else if(2==left_direction_buf[turn_val])
+			{
 				--turn_P.y;
-			}else if(3==left_direction_buf[turn_val]){
+			}
+			else if(3==left_direction_buf[turn_val])
+			{
 				++turn_P.x;--turn_P.y;
-			}else if(4==left_direction_buf[turn_val]){
+			}
+			else if(4==left_direction_buf[turn_val])
+			{
 				++turn_P.x;
-			}else if(5==left_direction_buf[turn_val]){
+			}
+			else if(5==left_direction_buf[turn_val])
+			{
 				++turn_P.x;++turn_P.y;
-			}else if(6==left_direction_buf[turn_val]){
+			}
+			else if(6==left_direction_buf[turn_val])
+			{
 				++turn_P.y;
-			}else if(7==left_direction_buf[turn_val]){
+			}
+			else if(7==left_direction_buf[turn_val])
+			{
 				--turn_P.x;++turn_P.y;
-			}else if(8==left_direction_buf[turn_val]){
+			}
+			else if(8==left_direction_buf[turn_val])
+			{
 				--turn_P.x;
-			}else if(0==left_direction_buf[turn_val]){
+			}
+			else if(0==left_direction_buf[turn_val])
+			{
 				printf("it is end buf_val=%d val=%d px=%d py=%d\n",turn_val,left_direction_buf[turn_val],turn_P.x,turn_P.y);
 				return 0;
 			}
 			memcpy(&line_left[left_count],&turn_P,sizeof(AB_point));
 			
-			if(left_count>8){
+			if(left_count>8)
+			{
 				/*
 				if((map[turn_P.y-1][turn_P.x-1].status&0x0F)==0x0E||\
 				(map[turn_P.y-1][turn_P.x].status&0x0F)==0x0E||\
@@ -458,32 +511,51 @@ int Draw_direction::small_turn(int direction)
 			return 1;
 				
 		}
-		if(direction==2){
+		if(direction==2)
+		{
 			//printf("buf_val=%d val=%d\n",turn_val,right_direction_buf[turn_val]);
-			if(1==right_direction_buf[turn_val]){
+			if(1==right_direction_buf[turn_val])
+			{
 				--turn_P.x;--turn_P.y;
-			}else if(2==right_direction_buf[turn_val]){
+			}
+			else if(2==right_direction_buf[turn_val])
+			{
 				--turn_P.y;
-			}else if(3==right_direction_buf[turn_val]){
+			}
+			else if(3==right_direction_buf[turn_val])
+			{
 				++turn_P.x;--turn_P.y;
-			}else if(4==right_direction_buf[turn_val]){
+			}
+			else if(4==right_direction_buf[turn_val])
+			{
 				++turn_P.x;
-			}else if(5==right_direction_buf[turn_val]){
+			}
+			else if(5==right_direction_buf[turn_val])
+			{
 				++turn_P.x;++turn_P.y;
-			}else if(6==right_direction_buf[turn_val]){
+			}
+			else if(6==right_direction_buf[turn_val])
+			{
 				++turn_P.y;
-			}else if(7==right_direction_buf[turn_val]){
+			}
+			else if(7==right_direction_buf[turn_val])
+			{
 				--turn_P.x;++turn_P.y;
-			}else if(8==right_direction_buf[turn_val]){
+			}
+			else if(8==right_direction_buf[turn_val])
+			{
 				--turn_P.x;
-			}else if(0==right_direction_buf[turn_val]){
+			}
+			else if(0==right_direction_buf[turn_val])
+			{
 				printf("it is end buf_val=%d val=%d px=%d py=%d\n",turn_val,right_direction_buf[turn_val],turn_P.x,turn_P.y);
 				return 0;
 			}
 			memcpy(&line_right[right_count],&turn_P,sizeof(AB_point));
 			++right_count;
 			
-			if(right_count>5){
+			if(right_count>5)
+			{
 				if((map[turn_P.y-1][turn_P.x-1].status&0x0F)==0x0E||\
 				(map[turn_P.y-1][turn_P.x].status&0x0F)==0x0E||\
 				(map[turn_P.y-1][turn_P.x+1].status&0x0F)==0x0E||\
@@ -517,9 +589,11 @@ int Draw_direction::draw_circle()
 	//printf("circle line:turn x=%d y=%d\n",line_circle[0].x,line_circle[0].y);
 	(map[start_P.y][start_P.x].status&=0xF0)|=0x0E;
 	++circle_count;
-	while(1){
+	while(1)
+	{
 		int ret=small_turn(0);
-		if(0==ret||2==ret){
+		if(0==ret||2==ret)
+		{
 			break;
 		}	
 		
@@ -529,7 +603,8 @@ int Draw_direction::draw_circle()
 
 int connect_line(AB_point* P1,AB_point* P2)
 {
-	if(P1->x-P2->x>1||P1->x-P2->x<-1||P1->y-P2->y>1||P1->y-P2->y<-1){
+	if(P1->x-P2->x>1||P1->x-P2->x<-1||P1->y-P2->y>1||P1->y-P2->y<-1)
+	{
 		//(map[(By+Ay)/2][(Bx+Ax)/2]&=0xF0)|=0x0E;
 //		line[line_count].x=(Bx+Ax)/2;
 //		line[line_count].y=(By+Ay)/2;
@@ -549,10 +624,13 @@ int Draw_direction::cut_circle(AB_point* P1,AB_point* P2)
 	AB_point tmp_P;
 	memcpy(&tmp_P,P2,sizeof(AB_point));
 	
-	if(t_x==1&&t_y==1){
-		while(1){
+	if(t_x==1&&t_y==1)
+	{
+		while(1)
+		{
 			++tmp_P.x;++tmp_P.y;
-			if((map[tmp_P.y][tmp_P.x].status&0x0F)==0x0E){
+			if((map[tmp_P.y][tmp_P.x].status&0x0F)==0x0E)
+			{
 				
 			}	
 		}
@@ -568,8 +646,10 @@ int Draw_direction::turn_left_line()
 	memset(tmp_line,0,sizeof(tmp_line));
 	Draw_line *goto_end=new Draw_line(map);
 	int i=0;
-	if(circle_flag){
-		while(1){
+	if(circle_flag)
+	{
+		while(1)
+		{
 			memcpy(&line_left[left_count],&line_circle[left_count],sizeof(AB_point));
 			if(0==goto_end->run_this_line(line_circle[left_count].x,line_circle[left_count].y,end_P.x,end_P.y,2))
 			{
@@ -583,12 +663,15 @@ int Draw_direction::turn_left_line()
 			}
 			
 			
-			if(++left_count>1999){
+			if(++left_count>1999)
+			{
 				printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nleft_count>1999 is bad\ngoto_end is bad\ngoto_end is bad\ngoto_end is bad\ngoto_end is bad\n\n\n\n\n");
 				break;
 			}
 		}
-	}else{
+	}
+	else
+	{
 		printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncircle_flag=0 is bad\ncircle is bad\ncircle is bad\ncircle is bad\ncircle is bad\n\n\n\n\n");
 	}
 	delete(goto_end);
@@ -617,8 +700,10 @@ int Draw_direction::turn_right_line()
 	
 	int i=0;
 	int ii=circle_count-1;		
-	if(circle_flag){
-		while(1){
+	if(circle_flag)
+	{
+		while(1)
+		{
 			//memcpy(&turn_P,&line_circle[right_count-1],sizeof(AB_point));
 			//printf("ii=%d\n",ii);
 			
@@ -633,12 +718,15 @@ int Draw_direction::turn_right_line()
 				//printf("goto end ok\n\n");
 				break;
 			}
-			if(++right_count>1999){
+			if(++right_count>1999)
+			{
 				printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncircle is bad\ngoto_end is bad\ngoto_end is bad\ngoto_end is bad\ngoto_end is bad\n\n\n\n\n");
 				break;
 			}
 		}
-	}else{
+	}
+	else
+	{
 		printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncircle is bad\ncircle is bad\ncircle is bad\ncircle is bad\ncircle is bad\n\n\n\n\n");
 	}
 	delete(goto_end);
@@ -649,7 +737,8 @@ int Draw_direction::turn_right_line()
 int Draw_direction::get_line_circle(AB_point* tmp_line)
 {
 	int i=0;
-	for(i=0;i<circle_count+1;++i){
+	for(i=0;i<circle_count+1;++i)
+	{
 		memcpy(&tmp_line[i],&line_circle[i],sizeof(AB_point));	
 	}
 	return circle_count+1;
@@ -659,7 +748,8 @@ int Draw_direction::get_line_circle(AB_point* tmp_line)
 int Draw_direction::get_line_right(AB_point* tmp_line)
 {
 	int i=0;
-	for(i=0;i<left_count;++i){
+	for(i=0;i<left_count;++i)
+	{
 		memcpy(&tmp_line[i],&line_left[i],sizeof(AB_point));	
 	}
 	return left_count;
@@ -668,7 +758,8 @@ int Draw_direction::get_line_right(AB_point* tmp_line)
 int Draw_direction::get_line_left(AB_point* tmp_line)
 {
 	int i=0;
-	for(i=0;i<right_count;++i){
+	for(i=0;i<right_count;++i)
+	{
 		memcpy(&tmp_line[i],&line_right[i],sizeof(AB_point));	
 	}
 	return right_count;
